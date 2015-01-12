@@ -24,7 +24,6 @@
   :serial t
   :depends-on (:introlisp.intro/core
                :log4cl
-               ;:cffi
                :unix-options
                :getopt
                :cli-parser
@@ -32,6 +31,8 @@
                :py-configparser
                :cl-json
                :cl-yaml
+               :introlisp.util
+               :introlisp.practice
               )
 #|
   :components ((:module "src"
@@ -48,7 +49,8 @@
   :pathname "tests/"
   :serial t
   :depends-on (:introlisp.intro
-               ;:cl-quickcheck
+               :introlisp.util
+               :cl-quickcheck
                :fiveam
                )
 #|

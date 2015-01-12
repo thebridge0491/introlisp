@@ -24,7 +24,7 @@
 			(z (5am:gen-integer)))
 		(let ((a (float x)) (b (float y)) (c (float z)))
 			;(5am:is (= (+ (+ a b) c) (+ a (+ b c))))
-			(5am:is (in-epsilon (+ (+ a b) c) (+ a (+ b c))
+			(5am:is (util:in-epsilon (+ (+ a b) c) (+ a (+ b c))
 				(* +epsilon+ (+ (+ a b) c)))))))
 
 (5am:test (prop-revrev)
@@ -45,5 +45,5 @@
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 1 :max 20)
 			:elements (5am:gen-float :bound 1000))))
 		(let ((ys (sort (copy-seq xs) #'<)))
-			(5am:is (in-epsilon (apply #'min xs) (car ys)
+			(5am:is (util:in-epsilon (apply #'min xs) (car ys)
 				(* +epsilon+ (car ys)))))))

@@ -64,12 +64,7 @@
 (rename-package 'cl-quickcheck 'cl-quickcheck '(qc))
 ;(setf qc:*num-trials* 100)
 
-;(rename-package 'introlisp.util.classic 'introlisp.util.classic '(classic)) 
-
-(defun in-epsilon (a b &optional (tolerance 0.001))
-	(let ((delta (abs tolerance)))
-		;(and (<= (- a delta) b) (>= (+ (a delta) b))))
-		(and (not (< (+ a delta) b)) (not (< (+ b delta) a)))))
+(rename-package 'introlisp.util 'introlisp.util '(:util)) 
 
 (defconstant +epsilon+ 0.001)
 
@@ -81,16 +76,14 @@
 (mapcar (lambda (filenm) (load (merge-pathnames filenm
 		(asdf:system-source-file :introlisp.util))))
 	'("tests/new-tests.lisp" "tests/new-props.lisp"
-		#|"tests/classic-tests.lisp" "tests/classic-props.lisp"|#
 		)
 	)
 
 (defun main (argv)
     (mapcar (lambda (suite) (fiveam:run! suite))
-		(list 'tc-new 'tp-new #|'tc-classic 'tp-classic|#))
+		(list 'tc-new 'tp-new))
 	
-	;(introlisp.util.classic:close-lib)
-    ) ;(uiop:quit))
+	) ;(uiop:quit))
 
 ;(if (member (pathname-name *load-truename*) (uiop:command-line-arguments)
 ;        :test #'(lambda (x y) (search x y :test #'equalp)))

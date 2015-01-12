@@ -8,7 +8,7 @@ help:
 COMPILER = sbcl
 
 parent = introlisp
-SUBDIRS = common app
+SUBDIRS = common foreignc api app
 
 .PHONY: all help clean test repl_test uninstall install
 help: $(SUBDIRS)

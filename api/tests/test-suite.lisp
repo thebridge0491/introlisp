@@ -50,21 +50,24 @@
 	(require "asdf"))
 |#
 
-(asdf:load-systems :cl-quickcheck :fiveam :introlisp.util :introlisp.intro)
+(asdf:load-systems :log4cl :cl-quickcheck :fiveam :introlisp.util :introlisp.practice)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :introlisp.intro)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :introlisp.practice)' in your Lisp.
 
-(defpackage :introlisp.intro/test
-  (:documentation "Test system for introlisp.intro")
-  (:use :cl :fiveam :introlisp.util :introlisp.intro)
+(defpackage :introlisp.practice/test
+  (:documentation "Test system for introlisp.practice")
+  (:use :cl :log4cl :fiveam :introlisp.util :introlisp.practice)
   (:export :main :run-suites :save-image)
   )
-(in-package :introlisp.intro/test)
+(in-package :introlisp.practice/test)
 
 (rename-package 'cl-quickcheck 'cl-quickcheck '(qc))
 ;(setf qc:*num-trials* 100)
 
-(rename-package 'introlisp.util 'introlisp.util '(:util)) 
+(rename-package 'introlisp.util 'introlisp.util '(util))
+(rename-package 'introlisp.practice.classic 'introlisp.practice.classic '(classic)) 
+(rename-package 'introlisp.practice.sequenceops 'introlisp.practice.sequenceops
+  '(sequenceops seqops)) 
 
 (defconstant +epsilon+ 0.001)
 
@@ -74,14 +77,14 @@
 
 
 (mapcar (lambda (filenm) (load (merge-pathnames filenm
-		(asdf:system-source-file :introlisp.intro))))
-	'("tests/new-tests.lisp" "tests/new-props.lisp"
-		)
+		(asdf:system-source-file :introlisp.practice))))
+	'("tests/classic-tests.lisp" "tests/classic-props.lisp"
+		"tests/sequenceops-tests.lisp" "tests/sequenceops-props.lisp")
 	)
 
 (defun main (argv)
     (mapcar (lambda (suite) (fiveam:run! suite))
-		(list 'tc-new 'tp-new))
+		(list 'tc-classic 'tp-classic 'tc-sequenceops 'tp-sequenceops))
 	
 	) ;(uiop:quit))
 
@@ -97,7 +100,7 @@
 
 (defun save-image ()
 	#+sbcl (sb-ext:save-lisp-and-die "build/ts_main" :executable t
-		:toplevel 'introlisp.intro/test:run-suites)
+		:toplevel 'introlisp.practice/test:run-suites)
 	#+ccl (ccl:save-application "build/ts_main" :prepend-kernel t
-		:toplevel-function 'introlisp.intro/test:run-suites)
+		:toplevel-function 'introlisp.practice/test:run-suites)
 	)

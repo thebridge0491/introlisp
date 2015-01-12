@@ -4,10 +4,11 @@
 ; state       ;;   State of program or following code
 ; explanation ;    Regarding line on which it appears
 
-(defpackage :introlisp.intro/core
+(defpackage :introlisp.foreignc
+  (:documentation "FFI sub-package for Common Lisp Intro examples project.")
   (:use :cl)
-  (:import-from :introlisp.intro/src/lib)
-  (:import-from :introlisp.intro/src/person)
-  (:import-from :introlisp.intro/src/main)
-  
+  (:export :in-epsilon :cartesian-prod)
   )
+(in-package :introlisp.foreignc)
+
+;(defparameter *version* "X.Y.Z" "library version.")

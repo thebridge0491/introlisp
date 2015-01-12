@@ -1,0 +1,16 @@
+{
+    "prototype": "hashTable",
+    "hostname": "localhost",
+    "domain": "inet",
+    
+    "file1": {
+		"prototype": "hashTable",
+        "path": "temp",
+        "ext": "txt"
+    },
+    "user1": {
+		"prototype": "hashTable",
+        "name": "John",
+        "age": 35
+    }
+}

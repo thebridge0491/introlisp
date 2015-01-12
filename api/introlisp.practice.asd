@@ -1,15 +1,15 @@
 ;; -*- Lisp -*-
 
 #|
-  This file is a part of introlisp.util project.
+  This file is a part of introlisp.practice project.
 |#
 #|
-  Utilites sub-package for Common Lisp Intro examples project.
+  Practice sub-package for Common Lisp Intro examples project.
 |#
-#-asdf3.1 (error "Introlisp.Util requires ASDF >= 3.1.2, please upgrade asdf")
+#-asdf3.1 (error "Introlisp.Practice requires ASDF >= 3.1.2, please upgrade asdf")
 
-(defsystem :introlisp.util
-  :description "Utilites sub-package for Common Lisp Intro examples project."
+(defsystem :introlisp.practice
+  :description "Practice sub-package for Common Lisp Intro examples project."
   :long-description
   #.(read-file-string (subpathname *load-pathname* "README.rst"))
   :author "thebridge0491"
@@ -22,24 +22,25 @@
   
   :class :package-inferred-system
   :serial t
-  :depends-on (:introlisp.util/core
-               ;:log4cl
+  :depends-on (:introlisp.practice/core
+               :log4cl
               )
 #|
   :components ((:module "src"
                 :components ((:file "lib"))
                ))
 |#
-  :in-order-to ((test-op (test-op :introlisp.util/test)))
+  :in-order-to ((test-op (test-op :introlisp.practice/test)))
   )
 
-(defsystem :introlisp.util/test
-  :description "Test system for introlisp.util"
+(defsystem :introlisp.practice/test
+  :description "Test system for introlisp.practice"
   :author "thebridge0491"
   
   :pathname "tests/"
   :serial t
-  :depends-on (:introlisp.util
+  :depends-on (:introlisp.practice
+               :introlisp.util
                :cl-quickcheck
                :fiveam
                )
@@ -48,25 +49,25 @@
 			   )
 |#  
   ;:perform (test-op :after (op c) (symbol-call :fiveam :run-all-tests))
-  ;:perform (test-op :after (op c) (symbol-call :fiveam :run! (find-symbol* 'suite '#:introlisp.util/test)))
-  :perform (test-op :after (op c) (symbol-call :introlisp.util/test :run-suites))
+  ;:perform (test-op :after (op c) (symbol-call :fiveam :run! (find-symbol* 'suite '#:introlisp.practice/test)))
+  :perform (test-op :after (op c) (symbol-call :introlisp.practice/test :run-suites))
   )
 #|
 (defmethod perform ((op test-op)
-	(c (eql (find-system '#:introlisp.util/test))))
-	;(funcall (intern "RUN!" :fiveam) (intern "SUITE" :introlisp.util/test))
-	(symbol-call :introlisp.util/test :run-suites)
+	(c (eql (find-system '#:introlisp.practice/test))))
+	;(funcall (intern "RUN!" :fiveam) (intern "SUITE" :introlisp.practice/test))
+	(symbol-call :introlisp.practice/test :run-suites)
 	)
 |#
 
-(defsystem :introlisp.util/test-image
-  :description "Test system image for introlisp.util"
+(defsystem :introlisp.practice/test-image
+  :description "Test system image for introlisp.practice"
   :author "thebridge0491"
   
-  :depends-on (:introlisp.util/test)
+  :depends-on (:introlisp.practice/test)
   :build-operation program-op
   :build-pathname "build/ts_main"
-  :entry-point "introlisp.util/test:run-suites"
+  :entry-point "introlisp.practice/test:run-suites"
   :perform (test-op :after (op c) (run-program "build/ts_main" :output *standard-output*))
   )
 

@@ -4,7 +4,7 @@
 ; state       ;;   State of program or following code
 ; explanation ;    Regarding line on which it appears
 
-(in-package :introlisp.util/test)
+(in-package :introlisp.practice/test)
 
 (5am:def-suite tp-classic
 	:description "Classic Properties suite")
@@ -20,12 +20,12 @@
 			(y (5am:gen-integer :min 2 :max 10)))
 		(let* ((b (float x)) (n (float y)) (ans (expt b n)))
 			(5am:is (reduce (lambda (a f)
-				(and a (in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
-				'(classic:expt-lp classic:expt-i) :initial-value t)))))
+				(and a (util:in-epsilon (* +epsilon+ ans) ans (funcall f b n))))
+				'(classic:expt-r classic:expt-i) :initial-value t)))))
 
 (5am:test (prop-fact)
     (5am:for-all ((n (5am:gen-integer :min 0 :max 18)))
 		(let* ((ans (reduce #'* (loop for i from 0 below n collect (1+ i))
 				:initial-value 1)))
 			(5am:is (reduce (lambda (a f) (and a (= ans (funcall f n))))
-				'(classic:fact-lp classic:fact-i) :initial-value t)))))
+				'(classic:fact-r classic:fact-i) :initial-value t)))))

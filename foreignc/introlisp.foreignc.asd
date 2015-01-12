@@ -1,15 +1,15 @@
 ;; -*- Lisp -*-
 
 #|
-  This file is a part of introlisp.util project.
+  This file is a part of introlisp.foreignc project.
 |#
 #|
-  Utilites sub-package for Common Lisp Intro examples project.
+  FFI sub-package for Common Lisp Intro examples project.
 |#
-#-asdf3.1 (error "Introlisp.Util requires ASDF >= 3.1.2, please upgrade asdf")
+#-asdf3.1 (error "Introlisp.Foreignc requires ASDF >= 3.1.2, please upgrade asdf")
 
-(defsystem :introlisp.util
-  :description "Utilites sub-package for Common Lisp Intro examples project."
+(defsystem :introlisp.foreignc
+  :description "FFI sub-package for Common Lisp Intro examples project."
   :long-description
   #.(read-file-string (subpathname *load-pathname* "README.rst"))
   :author "thebridge0491"
@@ -22,24 +22,26 @@
   
   :class :package-inferred-system
   :serial t
-  :depends-on (:introlisp.util/core
+  :depends-on (:introlisp.foreignc/core
                ;:log4cl
+               :cffi
               )
 #|
   :components ((:module "src"
                 :components ((:file "lib"))
                ))
 |#
-  :in-order-to ((test-op (test-op :introlisp.util/test)))
+  :in-order-to ((test-op (test-op :introlisp.foreignc/test)))
   )
 
-(defsystem :introlisp.util/test
-  :description "Test system for introlisp.util"
+(defsystem :introlisp.foreignc/test
+  :description "Test system for introlisp.foreignc"
   :author "thebridge0491"
   
   :pathname "tests/"
   :serial t
-  :depends-on (:introlisp.util
+  :depends-on (:introlisp.foreignc
+               :introlisp.util
                :cl-quickcheck
                :fiveam
                )
@@ -48,25 +50,25 @@
 			   )
 |#  
   ;:perform (test-op :after (op c) (symbol-call :fiveam :run-all-tests))
-  ;:perform (test-op :after (op c) (symbol-call :fiveam :run! (find-symbol* 'suite '#:introlisp.util/test)))
-  :perform (test-op :after (op c) (symbol-call :introlisp.util/test :run-suites))
+  ;:perform (test-op :after (op c) (symbol-call :fiveam :run! (find-symbol* 'suite '#:introlisp.foreignc/test)))
+  :perform (test-op :after (op c) (symbol-call :introlisp.foreignc/test :run-suites))
   )
 #|
 (defmethod perform ((op test-op)
-	(c (eql (find-system '#:introlisp.util/test))))
-	;(funcall (intern "RUN!" :fiveam) (intern "SUITE" :introlisp.util/test))
-	(symbol-call :introlisp.util/test :run-suites)
+	(c (eql (find-system '#:introlisp.foreignc/test))))
+	;(funcall (intern "RUN!" :fiveam) (intern "SUITE" :introlisp.foreignc/test))
+	(symbol-call :introlisp.foreignc/test :run-suites)
 	)
 |#
 
-(defsystem :introlisp.util/test-image
-  :description "Test system image for introlisp.util"
+(defsystem :introlisp.foreignc/test-image
+  :description "Test system image for introlisp.foreignc"
   :author "thebridge0491"
   
-  :depends-on (:introlisp.util/test)
+  :depends-on (:introlisp.foreignc/test)
   :build-operation program-op
   :build-pathname "build/ts_main"
-  :entry-point "introlisp.util/test:run-suites"
+  :entry-point "introlisp.foreignc/test:run-suites"
   :perform (test-op :after (op c) (run-program "build/ts_main" :output *standard-output*))
   )
 

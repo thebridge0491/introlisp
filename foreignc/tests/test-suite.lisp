@@ -50,21 +50,24 @@
 	(require "asdf"))
 |#
 
-(asdf:load-systems :cl-quickcheck :fiveam :introlisp.util :introlisp.intro)
+(asdf:load-systems :cl-quickcheck :fiveam :introlisp.util :introlisp.foreignc)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :introlisp.intro)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :introlisp.foreignc)' in your Lisp.
 
-(defpackage :introlisp.intro/test
-  (:documentation "Test system for introlisp.intro")
-  (:use :cl :fiveam :introlisp.util :introlisp.intro)
+(defpackage :introlisp.foreignc/test
+  (:documentation "Test system for introlisp.foreignc")
+  (:use :cl :fiveam :introlisp.util :introlisp.foreignc)
   (:export :main :run-suites :save-image)
   )
-(in-package :introlisp.intro/test)
+(in-package :introlisp.foreignc/test)
 
 (rename-package 'cl-quickcheck 'cl-quickcheck '(qc))
 ;(setf qc:*num-trials* 100)
 
-(rename-package 'introlisp.util 'introlisp.util '(:util)) 
+(rename-package 'introlisp.foreignc.classic 'introlisp.foreignc.classic '(classic)) 
+
+(rename-package :introlisp.util :introlisp.util '(:util))
+(rename-package 'introlisp.foreignc.classic 'introlisp.foreignc.classic '(classic)) 
 
 (defconstant +epsilon+ 0.001)
 
@@ -74,16 +77,17 @@
 
 
 (mapcar (lambda (filenm) (load (merge-pathnames filenm
-		(asdf:system-source-file :introlisp.intro))))
-	'("tests/new-tests.lisp" "tests/new-props.lisp"
+		(asdf:system-source-file :introlisp.foreignc))))
+	'("tests/classic-tests.lisp" "tests/classic-props.lisp"
 		)
 	)
 
 (defun main (argv)
     (mapcar (lambda (suite) (fiveam:run! suite))
-		(list 'tc-new 'tp-new))
+		(list 'tc-classic 'tp-classic))
 	
-	) ;(uiop:quit))
+	(introlisp.foreignc.classic:close-lib)
+    ) ;(uiop:quit))
 
 ;(if (member (pathname-name *load-truename*) (uiop:command-line-arguments)
 ;        :test #'(lambda (x y) (search x y :test #'equalp)))
@@ -97,7 +101,7 @@
 
 (defun save-image ()
 	#+sbcl (sb-ext:save-lisp-and-die "build/ts_main" :executable t
-		:toplevel 'introlisp.intro/test:run-suites)
+		:toplevel 'introlisp.foreignc/test:run-suites)
 	#+ccl (ccl:save-application "build/ts_main" :prepend-kernel t
-		:toplevel-function 'introlisp.intro/test:run-suites)
+		:toplevel-function 'introlisp.foreignc/test:run-suites)
 	)

@@ -4,10 +4,10 @@
 ; state       ;;   State of program or following code
 ; explanation ;    Regarding line on which it appears
 
-(defpackage :introlisp.intro/core
+(defpackage :introlisp.practice/core
   (:use :cl)
-  (:import-from :introlisp.intro/src/lib)
-  (:import-from :introlisp.intro/src/person)
-  (:import-from :introlisp.intro/src/main)
+  (:import-from :introlisp.practice/src/lib)
+  (:import-from :introlisp.practice/src/classic)
+  (:import-from :introlisp.practice/src/sequenceops)
   
   )

@@ -4,7 +4,7 @@
 ; state       ;;   State of program or following code
 ; explanation ;    Regarding line on which it appears
 
-(in-package :introlisp.intro/test)
+(in-package :introlisp.foreignc/test)
 
 (5am:def-suite tc-classic
 	:description "Classic Tests suite")
@@ -19,7 +19,7 @@
 	(mapcar (lambda (tup)
 		(let* ((b (car tup)) (n (cdr tup)) (ans (expt b n)))
 		(mapcar (lambda (f)
-			(5am:is (in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
+			(5am:is (util:in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
 			'(classic:expt-lp classic:expt-i))))
 		(mapcan (lambda (x) (mapcar (lambda (y) (cons x y)) '(2.0 11.0 20.0))) 
 			'(3.0 6.0 10.0))))

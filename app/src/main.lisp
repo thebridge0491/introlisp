@@ -49,8 +49,10 @@
 	(require "asdf"))
 |#
 
-(asdf:load-systems :log4cl :unix-options :py-configparser :cl-ppcre :cl-json
-	:cl-yaml) ; :introlisp.intro/src/lib :introlisp.intro/src/person)
+(asdf:load-systems :log4cl :unix-options :getopt :cli-parser 
+    :py-configparser :cl-ppcre :cl-json :cl-yaml :introlisp.util 
+    :introlisp.practice :introlisp.intro/src/lib 
+    :introlisp.intro/src/person)
 
 (defpackage :introlisp.intro/src/main
   (:documentation "Main app")
@@ -61,32 +63,206 @@
   )
 (in-package :introlisp.intro/src/main)
 
-;(rename-package :introlisp.intro/src/lib :introlisp.intro/src/lib '(:lib))
-;(rename-package :introlisp.intro.person :introlisp.intro.person '(:person))
+(rename-package :introlisp.util :introlisp.util '(:util))
+(rename-package :introlisp.practice.classic :introlisp.practice.classic
+	'(:classic))
+(rename-package :introlisp.practice.sequenceops :introlisp.practice.sequenceops
+	'(:sequenceops :seqops))
+(rename-package :introlisp.intro/src/lib :introlisp.intro/src/lib '(:lib))
+(rename-package :introlisp.intro/src/person :introlisp.intro/src/person '(:person))
 
-(defun mkstring-htbl (htbl)
-	(with-hash-table-iterator (next-entry htbl)
-		(loop
-			collect (multiple-value-bind (more? k v) (next-entry)
-				(unless more? (return lst))
-				(format nil "{~a: ~a} " k v)) into lst))
-	)
+(defstruct (user 
+        (:constructor make-user)
+        (:constructor create-user (name num timein)) 
+        (:conc-name user-)
+        (:predicate user-p))
+    "User structure"
+    
+    (name "NoName" :type string :read-only nil)
+    (num 0 :type fixnum :read-only nil)
+    (timein (encode-universal-time 0 0 0 1 1 1970) :type fixnum 
+        :read-only nil))
 
-(defun run-intro (name)
+(defun run-intro (rsrc-dir name num is-expt2)
 	"Run intro"
-	(let ((pat "(?i:^quit$)"))
-		(format t "~a match ~a to ~a~%" (if (cl-ppcre:scan pat name) 
-			"Good" "Does not") name pat)
+	(let* ((time-in (get-internal-real-time)) (pat "(?i:^quit$)") (ch #\Nul)
+			(greet-path (merge-pathnames "greet.txt" rsrc-dir))
+            (delay-secs (ceiling (/ 25 10)))
+			(user1 (make-user :name name :num num :timein (get-universal-time)))
+			(person1 (make-instance 'person:<person> :name "I. M. Computer" 
+                :age 32))
+            (num-vec (vector #b1011 #o13 #xb 11)) ; (bin oct hex dec)
+            (num-val 0) (time-dur 0.0) (lst '(2 1 0 4 3))
+            (rnd-state (make-random-state t))
+			)
+		(setf num-val (reduce (lambda (a e) (+ a e)) num-vec 
+            :initial-value 0))
+        ;(if (not (= num-val
+        ;    (* (length num-vec) (aref num-vec 0))))
+        ;    (error "Assert fails: len * 1st elem == num-val->~a" num-val))
+		(handler-case
+            (assert (= num-val (* (length num-vec) (aref num-vec 0))))
+            (error (exc) (format t "~a~%" exc)))
+        
+        (setf ch (lib:delay-char (lambda () (sleep delay-secs))))
+        
+        (if (= 0 (user-num user1))
+            (setf (user-num user1) (+ (random 18 rnd-state) 2)))
+        
+        (format t "~a match ~a to ~a~%" (if (cl-ppcre:scan pat name) 
+			"Good" "Does not") (user-name user1) pat)
+		(format t "~a~%" (util:date-to-string (user-timein user1)))
+		
+        #|
+        (catch 'prac
+            (handler-bind (
+                (warning #'(lambda (exc) 
+                    (format t "Warning Condition: ~a~%" exc) (throw 'prac t)))
+                (file-error #'(lambda (exc) 
+                    (format t "File Error Condition: ~a~%" exc) 
+                        (throw 'prac t)))
+                (error #'(lambda (exc) 
+                    (format t "Error Condition: ~a~%" exc) (throw 'prac t))))
+                
+                (format t "~a~%" (lib:greeting greet-path 
+                    (user-name user1)))))
+        |#
+		(handler-case
+            (format t "~a~%" (lib:greeting greet-path 
+                (user-name user1)))
+            
+            (warning (exc) (format t "Warning Condition: ~a~%" exc))
+            (file-error (exc) (format t "File Error Condition: ~a~%" exc))
+            (error (exc) (format t "Error Condition: ~a~%" exc)))
+		
+		(setf time-dur (/ (- (get-internal-real-time) time-in) 
+			internal-time-units-per-second))
+		(format t "(program ~a) Took ~,2f seconds.~%" (uiop:argv0) time-dur)
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
+		(if is-expt2
+			(progn
+				(format t "expt 2.0 ~,1f: ~,1f~%" (user-num user1)
+					(classic:expt-i 2.0 (user-num user1)))
+				(format t "reverse ~a: ~a~%" lst (seqops:reverse-i lst))
+				(format t "sort ~a #'<: ~a~%" (append '(9 9 9 9) lst)
+					(sort (append '(9 9 9 9) lst) #'<))
+				)
+			(progn
+				(format t "fact ~a: ~a~%" (user-num user1)
+					(classic:fact-i (user-num user1)))
+				(format t "index (= 3 e) ~a: ~a~%" lst (seqops:index-i 
+					(lambda (e) (equal e 3)) lst))
+				(format t "append ~a ~a: ~a~%" '(9 9 9 9) lst
+					(append '(9 9 9 9) lst))
+				))
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
+		(format t "~a~%"
+			#+ccl (ccl::class-slots (find-class 'person:<person>))
+			#+sbcl (sb-mop:class-slots (find-class 'person:<person>))
+			)
+		;(format t "person-age person1: ~a~%" (slot-value person1 'person:age))
+		;(setf (slot-value person1 'person:age) 33)
+		(format t "person-age person1: ~a~%" (person:person-age person1))
+		(setf (person:person-age person1) 33)
+		(format t "setf (person-age person1) 33:~%")
+		(format t "~a~%" (person:peek-person person1))
+		(format t "type-of person1: ~a~%class-of person1: ~a~%" 
+			(type-of person1) (class-of person1))
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
 	))
 
-(defun parse-cmdopts (argv)
-	"Parse command-line options"
-    (log:info '(root) "parse-cmdopts")
+(defun parse-cmdopts-unix-options (argv)
+	"Parse cmdopts using unix-options"
     (unix-options:with-cli-options (argv t) 
-        ((verbose (verbose "VERBOSITY" "Verbosity level"))
-            (user (user "USER" "User name")))
+        ((2expt "Expt 2 n vice Fact n")
+            (verbose (verbose "VERBOSITY" "Verbosity level"))
+            (user (user "USER" "User name"))
+            (num (num "NUM" "Number to factorialize")))
         
-        (values (or verbose 0) (or user "World"))))
+        (values (or verbose 0) (or user "World") (or num "0") 2expt)))
+
+(defun show-help (progname)
+    "Usage help"
+    (format t "Usage: ~a [-h][-2][-v VERBOSITY][-u USER][-n NUM]~%" 
+        progname))
+
+(defparameter *opts* '(("help" :none) ("verbose" :required)
+	("user" :required) ("num" :required) ("is-expt2" :none))
+	"Options for getopt")
+
+(defun parse-cmdopts-getopt (argv)
+	"Parse cmdopts using getopt"
+    (let ((verbose 0) (user "World") (num "0") (is-expt2 nil))
+        (multiple-value-bind (args opts)
+            (getopt:getopt argv *opts*)
+            
+            ;(progn
+            ;   (mapcar (lambda (opt)
+            ;       (case (car opt)
+            ;           ("help" (show-help (uiop:argv0)) (uiop:quit))
+            ;           (t      ; {t|otherwise}
+            ;               (format t "??? No matching options.~%"))))
+            (progn
+                (mapcar (lambda (opt) 
+                    (cond
+                        ((equal (car opt) "help")
+                            (show-help (uiop:argv0)) (uiop:quit))
+                        ((equal (car opt) "is-expt2") (setf is-expt2 (cdr opt)))
+                        ((equal (car opt) "verbose") (setf verbose (cdr opt)))
+                        ((equal (car opt) "user") (setf user (cdr opt)))
+                        ((equal (car opt) "num") (setf num (cdr opt)))
+                        (t (format t "??? No matching options.~%"))))
+                    opts)
+                nil)
+            
+            (values verbose user num is-expt2))))
+
+(defparameter *option-conf* (list 
+	(make-instance 'cli-parser:cli-option :abbr "h" :full "help"
+		:requires-arguments nil :description "Usage help"
+		:example "--help")
+	(make-instance 'cli-parser:cli-option :abbr "v" :full "verbose"
+		:requires-arguments t :description "Verbosity level"
+		:example "--verbose=3")
+	(make-instance 'cli-parser:cli-option :abbr "u" :full "user"
+		:requires-arguments t :description "User name"
+		:example "--user=Name1")
+	(make-instance 'cli-parser:cli-option :abbr "n" :full "num"
+		:requires-arguments t :description "Number to factorialize"
+		:example "--num=5")
+	(make-instance 'cli-parser:cli-option :abbr "2" :full "is-expt2"
+		:requires-arguments nil :description "Expt 2 n vice Fact n"
+		:example "--is-expt2")
+	)
+	"Options for cli-parser")
+
+(defun parse-cmdopts-cli-parser (argv)
+	"Parse cmdopts using cli-parser"
+    (let ((opt-hash (cli-parser:cli-parse argv *option-conf*)))
+        
+        (if (not (gethash "help" opt-hash t))
+            (progn
+                (show-help (uiop:argv0))
+                (uiop:quit)))
+            
+        (values (car (gethash "verbose" opt-hash '(0)))
+            (car (gethash "user" opt-hash '("World"))) 
+            (car (gethash "num" opt-hash '("0")))
+            (not (gethash "is-expt2" opt-hash t))
+            )))
+
+(defun parse-cmdopts (argv)
+    "Parse command-line options"
+    (log:info '(root) "parse-cmdopts()")
+    
+    (cond
+        (nil (parse-cmdopts-getopt argv))
+        (nil (parse-cmdopts-cli-parser argv))
+        (t (parse-cmdopts-unix-options argv))
+        ))
 
 (defun main (argv)
 	"Entry point"
@@ -120,9 +296,9 @@
 					(py-configparser:get-option ini-cfg "user1" "name")))
 			(cons alst-cfg (cons (cdr (assoc :domain alst-cfg))
 				(cdr (assoc :name (cdr (assoc :user-1 alst-cfg))))))
-			(cons (mkstring-htbl obj-cfg) (cons (gethash "DOMAIN" htbl)
+			(cons (util:hashtbl->alist obj-cfg) (cons (gethash "DOMAIN" htbl)
 				(gethash "NAME" (gethash "USER-1" htbl))))
-			(cons (mkstring-htbl yaml-htbl) (cons (gethash "domain" yaml-htbl)
+			(cons (util:hashtbl->alist yaml-htbl) (cons (gethash "domain" yaml-htbl)
 				(gethash "name" (gethash "user1" yaml-htbl))))
 			)))
 			(map nil (lambda (tup3) (progn 
@@ -132,11 +308,11 @@
 				)) tup-vec)
 			)
 		
-		(multiple-value-bind (verbose user)
+		(multiple-value-bind (verbose user num is-expt2)
 			(parse-cmdopts argv)
 			
 			(handler-case 
-				(run-intro user)
+				(run-intro rsrc-dir user (or (parse-integer num :junk-allowed t) 5) is-expt2)
 				(type-error (condition) (uiop:quit))))
 		
     )) ;(uiop:quit))
