@@ -1,0 +1,30 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(in-package :{{name}}{{^name}}introlisp.util{{/name}}/test)
+
+(clunit:defsuite tc-new
+    ())
+
+(clunit:deffixture tc-new (@body)
+    (format t "~tSetUp ...~%")
+    @body
+    (format t "~t... TearDown~%"))
+    
+(clunit:deftest test-method (tc-new)
+    (clunit:assert-equal 4 (* 2 2)))
+
+(clunit:deftest test-dbl-method (tc-new)
+    (clunit:assert-equal 4.0 4.0))
+
+(clunit:deftest test-str-method (tc-new)
+    (clunit:assert-equal "Hello" "Hello"))
+
+(clunit:deftest test-fail-method (tc-new)
+    (clunit:assert-fail "Fail"))
+
+(clunit:deftest test-exception-method (tc-new)
+    (clunit:assert-condition arithmetic-error (let ((x 0)) (/ x))))

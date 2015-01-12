@@ -1,0 +1,48 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(in-package :{{name}}{{^name}}introlisp.util{{/name}}/test)
+
+(defun prop-commutadd ()
+	(qc:for-all ((a qc:an-integer) (b qc:an-integer))
+		(qc:named "prop-commutadd"
+		(qc:is= (+ a b) (+ b a)))))
+
+(defun prop-assocadd ()
+	(qc:for-all ((x qc:an-integer) (y qc:an-integer) (z qc:an-integer))
+		(qc:named "prop-assocadd"
+		(let ((a (float x)) (b (float y)) (c (float z)))
+			(qc:is= t (in-epsilon (+ (+ a b) c) (+ a (+ b c))
+				(* +epsilon+ (+ (+ a b) c))))))))
+
+(defun prop-revrev ()
+	(qc:for-all ((xs (qc:a-list qc:an-integer)))
+		(qc:named "prop-revrev"
+		(qc:is= t (equal xs (reverse (reverse xs)))))))
+
+(defun prop-idrev ()
+	(qc:for-all ((xs (qc:a-list qc:an-integer)))
+		(qc:named "prop-idrev"
+		(qc:is= t (equal xs (reverse xs))))))
+
+(defun prop-sortrev ()
+	(qc:for-all ((xs (qc:a-list qc:a-real)))
+		(qc:named "prop-sortrev"
+		(let ((ys (sort (copy-seq xs) #'<)) (zs (sort (reverse xs) #'<)))
+			(qc:is= t (equal ys zs))))))
+
+(defun prop-minsorthead ()
+	(qc:for-all ((xs (qc:a-list qc:a-real)))
+		(qc:named "prop-minsorthead"
+		(let ((ys (sort (copy-seq xs) #'<)))
+			(when (> (length xs) 1)
+				(qc:is= t (in-epsilon (apply #'min xs) (car ys)
+					(* +epsilon+ (car ys)))))))))
+
+(defun tp-new ()
+	"New Properties suite"
+	(progn (prop-commutadd) (prop-assocadd) (prop-revrev) (prop-idrev) 
+		(prop-sortrev) (prop-minsorthead)))

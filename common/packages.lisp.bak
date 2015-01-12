@@ -1,0 +1,14 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(defpackage :introlisp.util
+  (:documentation "Utilites sub-package for Common Lisp Intro examples project.")
+  (:use :cl)
+  (:export :in-epsilon :cartesian-prod)
+  )
+(in-package :introlisp.util)
+
+;(defparameter *version* "X.Y.Z" "library version.")

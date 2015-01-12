@@ -1,0 +1,33 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(in-package :{{name}}{{^name}}introlisp.util{{/name}}/test)
+
+(defun fixture-new (test-fun)
+	(format t "~tSetUp-->~%")
+	(funcall test-fun)
+	(format t "~t <--TearDown~%"))
+
+(lisp-unit2:define-test test-method
+	(:tags '(tag1))
+    (fixture-new (lambda () (lisp-unit2:assert-equal 4 (* 2 2)))))
+
+(lisp-unit2:define-test test-dbl-method
+	(:tags '(tag1))
+    (fixture-new (lambda () (lisp-unit2:assert-equal 4.0 4.0))))
+
+(lisp-unit2:define-test test-str-method
+	(:tags '(tag1))
+    (fixture-new (lambda () (lisp-unit2:assert-equal "Hello" "Hello"))))
+
+(lisp-unit2:define-test test-fail-method
+	(:tags '(tag2))
+    (fixture-new (lambda () (lisp-unit2:assert-true nil "Fail"))))
+
+(lisp-unit2:define-test test-exception-method
+	(:tags '(tag2))
+    (fixture-new (lambda () (lisp-unit2:assert-signal 'arithmetic-error 
+		(let ((x 0)) (/ x))))))

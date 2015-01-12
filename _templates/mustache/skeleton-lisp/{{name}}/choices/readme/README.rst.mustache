@@ -1,0 +1,57 @@
+{{parentcap}}{{^parentcap}}Introlisp{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+===========================================
+.. .rst to .html: rst2html5 foo.rst > foo.html
+..                pandoc -s -f rst -t html5 -o foo.html foo.rst
+
+{{description}}{{^description}}Utilities sub-package for Common Lisp Intro examples project.{{/description}}
+
+Installation
+------------
+source code tarball download:
+    
+        # [aria2c --check-certificate=false | wget --no-check-certificate | curl -kOL]
+        
+        FETCHCMD='aria2c --check-certificate=false'
+        
+        $FETCHCMD https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introlisp{{/parent}}/[get | archive]/master.zip
+
+version control repository clone:
+        
+        git clone https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introlisp{{/parent}}.git
+
+note quicklisp required for install
+
+cd <path> ; ln -sf $PWD {{name}}{{^name}}introlisp.util{{/name}} ; mv {{name}}{{^name}}introlisp.util{{/name}} ~/quicklisp/local-projects/
+
+sbcl --eval "(progn (ql:register-local-projects) (uiop:quit))"
+
+sbcl --load tests/test-suite.lisp --eval "({{name}}{{^name}}introlisp.util{{/name}}/test:main '())"
+
+Usage
+-----
+{{#executable}}
+	rlwrap sbcl
+	
+	 > (asdf:load-systems :{{name}}{{^name}}introlisp.util{{/name}})
+	 
+	 > (rename-package :{{name}}{{^name}}introlisp.util{{/name}} :{{name}}{{^name}}introlisp.util{{/name}} '(:{{project}}{{^project}}util{{/project}}))
+
+	 > ({{project}}{{^project}}util{{/project}}:main '())
+{{/executable}}
+{{^executable}}
+	rlwrap sbcl
+	
+	 > (asdf:load-systems :{{name}}{{^name}}introlisp.util{{/name}})
+	 
+	 > (rename-package :{{name}}{{^name}}introlisp.util{{/name}} :{{name}}{{^name}}introlisp.util{{/name}} '(:{{project}}{{^project}}util{{/project}}))
+
+	 > ({{project}}{{^project}}util{{/project}}:cartesian-prod '(0 1 2) '(10 20 30))
+{{/executable}}
+
+Author/Copyright
+----------------
+Copyright (c) {{year}}{{^year}}2015{{/year}} by {{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}} <{{email}}{{^email}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}-codelab@yahoo.com{{/email}}>
+
+License
+-------
+Licensed under the {{license}}{{^license}}Apache-2.0{{/license}} License. See LICENSE for details.

@@ -1,0 +1,29 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(in-package :{{name}}{{^name}}introlisp.util{{/name}}/test)
+
+(defun prop-expt ()
+	(qc:for-all ((x qc:an-integer) (y qc:an-integer))
+		(qc:named "prop-expt"
+		(let* ((b (float (1+ (mod x 20)))) (n (float (+ 2 (mod y 9))))
+				(ans (expt b n)))
+			(qc:is= t (reduce (lambda (a f)
+				(and a (in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
+				'(classic:expt-r classic:expt-i) :initial-value t))))))
+
+(defun prop-fact ()
+	(qc:for-all ((x qc:an-integer))
+		(qc:named "prop-fact"
+		(let* ((n (mod x 19)) (ans (reduce #'* 
+				(loop for i from 0 below n collect (1+ i)) :initial-value 1)))
+			(qc:is= t (reduce (lambda (a f)
+				(and a (= ans (funcall f n))))
+				'(classic:fact-r classic:fact-i) :initial-value t))))))
+
+(defun tp-classic ()
+	"Classic Properties suite"
+	(progn (prop-expt) (prop-fact)))

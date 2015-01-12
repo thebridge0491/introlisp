@@ -1,0 +1,14 @@
+(load #p"~/quicklisp/setup.lisp")
+
+(asdf:load-system :{{name}}{{^name}}introlisp.util{{/name}})
+
+
+(asdf:load-system :documentation-template)
+(documentation-template:create-template :{{name}}{{^name}}introlisp.util{{/name}} 
+	:subtitle (asdf:system-description (asdf:find-system :{{name}}{{^name}}introlisp.util{{/name}}))
+    :target #p"build/html/file_doctmplt.html")
+
+#|
+(asdf:load-system :codex)
+(codex:document :{{name}}{{^name}}introlisp.util{{/name}})
+|#

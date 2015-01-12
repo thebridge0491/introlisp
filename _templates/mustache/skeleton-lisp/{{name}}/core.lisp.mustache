@@ -1,0 +1,17 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(defpackage :{{name}}{{^name}}introlisp.util{{/name}}/core
+  (:use :cl)
+  {{#executable}}
+  (:import-from :{{name}}{{^name}}introlisp.util{{/name}}/src/main)
+  {{/executable}}
+  {{^executable}}
+  (:import-from :{{name}}{{^name}}introlisp.util{{/name}}/src/lib)
+  {{/executable}}
+  ;(:import-from :{{name}}{{^name}}introlisp.util{{/name}}/src/classic)
+  
+  )

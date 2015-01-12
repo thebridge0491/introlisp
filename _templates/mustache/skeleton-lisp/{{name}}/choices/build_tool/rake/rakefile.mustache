@@ -1,0 +1,72 @@
+PREFIX = ENV['prefix'] ? ENV['prefix'] : '/usr/local'
+DEBUG = ENV['DEBUG'] ? ENV['DEBUG'] : '0'
+
+RAKE = ENV['RAKE'] ? ENV['RAKE'] : 'rake'
+# Single package rakefile script.
+
+PKG_CONFIG = "pkg-config --with-path=#{PREFIX}/lib/pkgconfig"
+
+# COMPILER=[sbcl | ccl]
+COMPILER = ENV['COMPILER'] ? ENV['COMPILER'] : 'sbcl'
+
+class SharedVars
+  attr_accessor :parent, :pkg, :proj, :version
+  
+  def initialize
+    @parent, @pkg,  @version = 'new_parent', 'new_pkg', '0.0.0'
+    @proj = "new_parent-new_pkg"
+  end
+end
+
+VARS = SharedVars.new
+VARS.parent, pkg = '{{parent}}{{^parent}}introlisp{{/parent}}', '{{project}}{{^project}}util{{/project}}'
+VARS.proj, VARS.version = '{{name}}{{^name}}introlisp.util{{/name}}', '{{version}}{{^version}}0.1.0{{/version}}'
+#namespace_path = VARS.parent.gsub(/\./, '/')
+
+desc "Default target: #{RAKE} help"
+task :default => [:help]
+
+file 'build/.depend' do |t|
+  mkdir_p("#{ENV["HOME"]}/quicklisp/local-projects/#{VARS.parent}")
+  dirs_found = `find src tests -type d`
+  dirs_found.split("\n").each { |i| mkdir_p('build/' + i) || true }
+  cp_r(['resources'], 'build') || true
+  rm_rf(t.name) || true ; touch(t.name) || true
+end
+
+file 'build/ts_main' => 'tests/test-suite.lisp' do |t|
+  rm_f(t.name)
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load tests/test-suite.lisp --eval '(#{VARS.proj}/test:save-image)' || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{COMPILER} --load tests/test-suite.lisp --entry #{VARS.proj}/test:main --output #{t.name} || true"
+  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load tests/test-suite.lisp --eval '(asdf:make :#{VARS.proj}/test-image)' || true"
+end
+
+desc 'Compile target(s)'
+task :all => ['build/.depend'{{#executable}}, 'build/main'{{/executable}}]
+
+desc 'Build test target'
+task :testCompile => ['build/ts_main']
+{{#executable}}
+
+file 'build/main' => 'src/main.lisp' do |t|
+  rm_f(t.name)
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(#{VARS.proj}/save-image)' || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{COMPILER} --load src/main.lisp --entry #{VARS.proj}:main --output #{t.name} || true"
+  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(asdf:make :#{VARS.proj}/run-image)' || true"
+end
+
+desc 'Run program: rake run\[arg1,arg2\]'
+task :run, [:arg1] => :main do |t, args|
+  #export LD_LIBRARY_PATH=. # Linux
+  #setenv LD_LIBRARY_PATH . # FreeBSD
+  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} build/main #{args[:arg1]} #{args.extras.join(' ')} || true"
+end
+
+desc 'Start REPL & run: rake repl_run\[arg1,arg2\]'
+task :repl_run, [:arg1] do |t, args|
+  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(asdf:test-system :#{VARS.proj}/run)' #{args[:arg1]} #{args.extras.join(' ')} || true"
+end
+{{/executable}}
+
+require './rakefile-targets.rb'
+#require './rakefile-auxffi.rb'

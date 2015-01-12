@@ -1,0 +1,116 @@
+;; -*- Lisp -*-
+
+#|
+  This file is a part of {{name}}{{^name}}introlisp.util{{/name}} project.
+{{#author}}
+  Copyright (c) {{year}}{{^year}}2015{{/year}} by {{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}} <{{email}}{{^email}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}-codelab@yahoo.com{{/email}}>
+{{/author}}
+|#
+#|
+{{#description}}
+  {{description}}{{^description}}Utilites sub-package for Common Lisp Intro examples project.{{/description}}
+{{/description}}
+{{#author}}
+  Author: {{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}} <{{email}}{{^email}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}-codelab@yahoo.com{{/email}}>
+{{/author}}
+|#
+#-asdf3.1 (error "{{parentcap}}{{^parentcap}}Introlisp{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}} requires ASDF >= 3.1.2, please upgrade asdf")
+
+(defsystem :{{name}}{{^name}}introlisp.util{{/name}}
+  :description "{{description}}{{^description}}Utilites sub-package for Common Lisp Intro examples project.{{/description}}"
+  :long-description
+  #.(read-file-string (subpathname *load-pathname* "README{{readmeext}}{{^readmeext}}.rst{{/readmeext}}"))
+  :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"
+  :license "{{license}}{{^license}}Apache-2.0{{/license}}"
+  :homepage "https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introlisp{{/parent}}"
+  :source-control (:git "https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introlisp{{/parent}}.git")
+  ;:version (:read-file-form "package.lisp" :at (2 2))
+  :version (:read-file-form "version.sexp")
+  ;:defsystem-depends-on ((:version "asdf-package-system" "3.1.0.116"))
+  
+  :class :package-inferred-system
+  :serial t
+  :depends-on (:{{name}}{{^name}}introlisp.util{{/name}}/core
+               ;:log4cl
+               ;:cffi
+               {{#executable}}
+               :unix-options
+               :getopt
+               :cli-parser
+               :cl-ppcre
+               :py-configparser
+               :cl-json
+               :cl-yaml
+               {{/executable}}
+              )
+#|
+  :components ((:module "src"
+                :components ((:file "lib"){{#executable}} (:file "person") (:file "main"){{/executable}})
+               ))
+|#
+  :in-order-to ((test-op (test-op :{{name}}{{^name}}introlisp.util{{/name}}/test)))
+  )
+
+(defsystem :{{name}}{{^name}}introlisp.util{{/name}}/test
+  :description "Test system for {{name}}{{^name}}introlisp.util{{/name}}"
+  :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"
+  
+  :pathname "tests/"
+  :serial t
+  :depends-on (:{{name}}{{^name}}introlisp.util{{/name}}
+               ;:cl-quickcheck
+               :{{testfrwk}}{{^testfrwk}}fiveam{{/testfrwk}}
+               )
+#|
+  :components ((:file "test-suite") (:file "tc-new") (:file "tp-new")
+			   )
+|#  
+  ;:perform (test-op :after (op c) (symbol-call :fiveam :run-all-tests))
+  ;:perform (test-op :after (op c) (symbol-call :fiveam :run! (find-symbol* 'suite '#:{{name}}{{^name}}introlisp.util{{/name}}/test)))
+  :perform (test-op :after (op c) (symbol-call :{{name}}{{^name}}introlisp.util{{/name}}/test :run-suites))
+  )
+#|
+(defmethod perform ((op test-op)
+	(c (eql (find-system '#:{{name}}{{^name}}introlisp.util{{/name}}/test))))
+	;(funcall (intern "RUN!" :fiveam) (intern "SUITE" :{{name}}{{^name}}introlisp.util{{/name}}/test))
+	(symbol-call :{{name}}{{^name}}introlisp.util{{/name}}/test :run-suites)
+	)
+|#
+
+(defsystem :{{name}}{{^name}}introlisp.util{{/name}}/test-image
+  :description "Test system image for {{name}}{{^name}}introlisp.util{{/name}}"
+  :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"
+  
+  :depends-on (:{{name}}{{^name}}introlisp.util{{/name}}/test)
+  :build-operation program-op
+  :build-pathname "build/ts_main"
+  :entry-point "{{name}}{{^name}}introlisp.util{{/name}}/test:run-suites"
+  :perform (test-op :after (op c) (run-program "build/ts_main" :output *standard-output*))
+  )
+
+{{#executable}}
+(defsystem :{{name}}{{^name}}introlisp.util{{/name}}/run
+  :description "(App) Main system for {{name}}{{^name}}introlisp.util{{/name}}"
+  :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"
+  
+  :depends-on (:{{name}}{{^name}}introlisp.util{{/name}})
+  :perform (test-op :after (op c) (symbol-call :{{name}}{{^name}}introlisp.util{{/name}} :run-main))
+  )
+#|
+(defmethod perform ((op test-op)
+	(c (eql (find-system '#:{{name}}{{^name}}introlisp.util{{/name}}))))
+	(symbol-call :{{name}}{{^name}}introlisp.util{{/name}} :run-main)
+	)
+|#
+
+(defsystem :{{name}}{{^name}}introlisp.util{{/name}}/run-image
+  :description "(App) Main system image for {{name}}{{^name}}introlisp.util{{/name}}"
+  :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"
+  
+  :depends-on (:{{name}}{{^name}}introlisp.util{{/name}})
+  :build-operation program-op
+  :build-pathname "build/main"
+  :entry-point "{{name}}{{^name}}introlisp.util{{/name}}:run-main"
+  :perform (test-op :after (op c) (run-program "build/main" :output *standard-output*))
+  )
+{{/executable}}

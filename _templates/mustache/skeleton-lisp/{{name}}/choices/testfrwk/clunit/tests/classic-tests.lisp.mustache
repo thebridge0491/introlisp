@@ -1,0 +1,29 @@
+; Common Lisp - comments style conventions
+; title       ;;;; Short title for block of code
+; intro       ;;;  Description before block of code
+; state       ;;   State of program or following code
+; explanation ;    Regarding line on which it appears
+
+(in-package :{{name}}{{^name}}introlisp.util{{/name}}/test)
+
+(clunit:defsuite tc-classic
+    ())
+
+(clunit:deffixture tc-classic (@body)
+    (format t "~tSetUp ...~%")
+    @body
+    (format t "~t... TearDown~%"))
+
+(clunit:deftest test-expt (tc-classic)
+	(mapcar (lambda (tup)
+		(let* ((b (car tup)) (n (cdr tup)) (ans (expt b n)))
+		(mapcar (lambda (f) (clunit:assert-true (in-epsilon ans
+			(funcall f b n) (* +epsilon+ ans))))
+			'(classic:expt-r classic:expt-i))))
+		(mapcan (lambda (x) (mapcar (lambda (y) (cons x y)) '(2.0 11.0 20.0))) 
+			'(3.0 6.0 10.0))))
+
+(clunit:deftest test-fact (tc-classic)
+    (mapcar (lambda (f)
+		(clunit:assert-equal 120 (funcall f 5)))
+		'(classic:fact-r classic:fact-i)))
