@@ -52,6 +52,8 @@
                :introlisp.util
                :cl-quickcheck
                :fiveam
+               :queues.simple-queue
+               :queues.priority-queue
                )
 #|
   :components ((:file "test-suite") (:file "tc-new") (:file "tp-new")

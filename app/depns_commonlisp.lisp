@@ -25,7 +25,8 @@
 (defun main (argv)
     (progn
 		(mapcar (lambda (pkg) (ql:quickload pkg))
-			(list "fiveam" "lisp-unit2" "clunit" "cl-quickcheck" "cl-project" "documentation-template" "codex" "buildapp" "cl-ppcre" "py-configparser" "cl-json" "cl-yaml" "log4cl" "unix-options" "getopt" "cli-parser" "cffi"))
+			(list "fiveam" "lisp-unit2" "clunit" "cl-quickcheck" "cl-project" "documentation-template" "codex" "buildapp" "cl-ppcre" "py-configparser" "cl-json" "cl-yaml" "log4cl" "unix-options" "getopt" "cli-parser" "cffi"
+			"queues.simple-queue" "queues.priority-queue"))
 		nil)
 
     ) ;(uiop:quit))

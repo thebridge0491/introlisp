@@ -50,7 +50,8 @@
 	(require "asdf"))
 |#
 
-(asdf:load-systems :cl-quickcheck :fiveam :introlisp.util :introlisp.intro)
+(asdf:load-systems :cl-quickcheck :fiveam :queues.simple-queue 
+	:queues.priority-queue :introlisp.util :introlisp.intro)
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :introlisp.intro)' in your Lisp.
 
@@ -75,13 +76,13 @@
 
 (mapcar (lambda (filenm) (load (merge-pathnames filenm
 		(asdf:system-source-file :introlisp.intro))))
-	'("tests/new-tests.lisp" "tests/new-props.lisp"
+	'("tests/collections-tests.lisp" "tests/collections-props.lisp"
 		)
 	)
 
 (defun main (argv)
     (mapcar (lambda (suite) (fiveam:run! suite))
-		(list 'tc-new 'tp-new))
+		(list 'tc-collections 'tp-collections))
 	
 	) ;(uiop:quit))
 
