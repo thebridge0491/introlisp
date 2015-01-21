@@ -9,5 +9,9 @@
   (:import-from :introlisp.practice/src/lib)
   (:import-from :introlisp.practice/src/classic)
   (:import-from :introlisp.practice/src/sequenceops)
+  (:import-from :introlisp.practice/src/classic-puzzles)
   
   )
+(in-package :introlisp.practice/core)
+
+(defvar rnd-state (make-random-state t))

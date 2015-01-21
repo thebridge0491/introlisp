@@ -70,6 +70,8 @@
 	'(:sequenceops :seqops))
 (rename-package :introlisp.intro/src/lib :introlisp.intro/src/lib '(:lib))
 (rename-package :introlisp.intro/src/person :introlisp.intro/src/person '(:person))
+(rename-package :introlisp.practice.classic.puzzles :introlisp.practice.classic.puzzles
+	'(:puzzles))
 
 (defstruct (user 
         (:constructor make-user)
@@ -94,6 +96,10 @@
             (num-vec (vector #b1011 #o13 #xb 11)) ; (bin oct hex dec)
             (num-val 0) (time-dur 0.0) (lst '(2 1 0 4 3))
             (rnd-state (make-random-state t))
+            (num-disks 4) (num-queens 8)
+            (res-queens (puzzles:nqueens num-queens))
+            (queens-ndx (random (length res-queens) rnd-state))
+            (queens-answer (nth queens-ndx res-queens))
 			)
 		(setf num-val (reduce (lambda (a e) (+ a e)) num-vec 
             :initial-value 0))
@@ -156,6 +162,25 @@
 				(format t "append ~a ~a: ~a~%" '(9 9 9 9) lst
 					(append '(9 9 9 9) lst))
 				))
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
+		(format t "pascaltri ~a: ~a~%" 5 (classic:pascaltri-add 5))
+		(format t "~a~%" (util:mkstring-nested (string #\newline) " " 
+			"" (classic:pascaltri-add 5)))
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
+		(multiple-value-bind (res stats moves)
+			(puzzles:hanoi-moves 1 2 3 num-disks)
+			(format t "hanoi-moves (result: ~a)~%(stats: ~a)" res stats))
+		(format t "~a~%" (util:mkstring-nested "" " " 
+			"" (multiple-value-bind (res stats moves)
+				(puzzles:hanoi-moves 1 2 3 num-disks) (list moves))))
+		(format t "~a~%" (make-string 40 :initial-element #\#))
+		
+		(format t "nqueens-grid ~a (idx: ~a): ~a" num-queens queens-ndx
+			queens-answer)
+		(format t "~a~%" (util:mkstring-nested (string #\newline) "-" ""
+			 (util:arr2d-to-nlsts (puzzles:nqueens-grid num-queens queens-answer))))
 		(format t "~a~%" (make-string 40 :initial-element #\#))
 		
 		(format t "~a~%"
