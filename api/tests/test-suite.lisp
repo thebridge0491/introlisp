@@ -75,6 +75,14 @@
 (defvar lst (loop for i from +num0+ below 5 collect i))
 (defvar revlst (loop for i from (- 5 1) downto +num0+ collect i))
 
+(defun unfold-right (pred func gen seed)
+	(loop for ini = seed then
+		(funcall gen ini)
+		until (funcall pred ini)
+		for acc = (list (funcall func ini)) then
+			(cons (funcall func ini) acc)
+		finally (return acc)))
+
 
 (mapcar (lambda (filenm) (load (merge-pathnames filenm
 		(asdf:system-source-file :introlisp.practice))))
