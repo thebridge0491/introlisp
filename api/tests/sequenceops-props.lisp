@@ -21,8 +21,8 @@
 				(ans (mapcar func (util:range-cnt 0 len))))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f func len)))) 
-				'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp)
-				:initial-value t))
+				'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp
+				seqops:tabulate-f seqops:tabulate-u) :initial-value t))
 			)))
 
 (5am:test (prop-length)
@@ -30,8 +30,8 @@
 		(let* ((ans (length xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs)))) 
-				'(seqops:length-r seqops:length-i seqops:length-lp) 
-				:initial-value t))
+				'(seqops:length-r seqops:length-i seqops:length-lp
+				seqops:length-f seqops:length-u) :initial-value t))
 			)))
 
 (5am:test (prop-nth)
@@ -41,7 +41,8 @@
 		(let* ((ans (nth ndx xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f ndx xs)))) 
-				'(seqops:nth-r seqops:nth-i seqops:nth-lp) :initial-value t))
+				'(seqops:nth-r seqops:nth-i seqops:nth-lp seqops:nth-f
+				seqops:nth-u) :initial-value t))
 			)
 		(5am:is (equal t t)))))
 
@@ -56,7 +57,9 @@
 					(equal ans-find (funcall fn-find pred xs)))))
 				'((seqops:index-r . seqops:find-r)
 				(seqops:index-i . seqops:find-i)
-				(seqops:index-lp . seqops:find-lp)) :initial-value t))
+				(seqops:index-lp . seqops:find-lp)
+				(seqops:index-f . seqops:find-f)
+				(seqops:index-u . seqops:find-u)) :initial-value t))
 			)))
 
 (5am:test (prop-min-max)
@@ -67,23 +70,25 @@
 				(and a (equal ans-min (apply fn-min xs))
 					(equal ans-max (apply fn-max xs)))))
 				'((seqops:min-r . seqops:max-r) (seqops:min-i . seqops:max-i) 
-				(seqops:min-lp . seqops:max-lp)) :initial-value t)))))
+				(seqops:min-lp . seqops:max-lp)
+				(seqops:min-f . seqops:max-f)
+				(seqops:min-u . seqops:max-u)) :initial-value t)))))
 
 (5am:test (prop-reverse)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
 		(let* ((ans (reverse xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs))))
-				'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp) 
-				:initial-value t)))))
+				'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp
+				seqops:reverse-f seqops:reverse-u) :initial-value t)))))
 
 (5am:test (prop-copy)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
 		(let* ((ans (copy-seq xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs))))
-				'(seqops:copy-r seqops:copy-i seqops:copy-lp)
-				:initial-value t)))))
+				'(seqops:copy-r seqops:copy-i seqops:copy-lp seqops:copy-f
+				seqops:copy-u) :initial-value t)))))
 
 (5am:test (prop-take-drop)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
@@ -95,7 +100,9 @@
 				(and a (equal ans-take (funcall fn-take n xs))
 					(equal ans-drop (funcall fn-drop n xs)))))
 				'((seqops:take-i . seqops:drop-i) 
-				(seqops:take-lp . seqops:drop-lp)) :initial-value t))
+				(seqops:take-lp . seqops:drop-lp)
+				(seqops:take-f . seqops:drop-f)
+				(seqops:take-u . seqops:drop-u)) :initial-value t))
 			)
 		(5am:is (equal t t)))))
 
@@ -109,7 +116,9 @@
 					(equal ans-every (funcall fn-every pred xs)))))
 				'((seqops:any-r . seqops:every-r)
 				(seqops:any-i . seqops:every-i)
-				(seqops:any-lp . seqops:every-lp)) :initial-value t))
+				(seqops:any-lp . seqops:every-lp)
+				(seqops:any-f . seqops:every-f)
+				(seqops:any-u . seqops:every-u)) :initial-value t))
 			)))
 
 (5am:test (prop-map)
@@ -117,8 +126,8 @@
 		(let* ((proc (lambda (e) (+ e 2))) (ans (mapcar proc xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs)))) 
-				'(seqops:map-r seqops:map-i seqops:map-lp)
-				:initial-value t))
+				'(seqops:map-r seqops:map-i seqops:map-lp seqops:map-f
+				seqops:map-u) :initial-value t))
 			)))
 #|
 (5am:test (prop-for-each)
@@ -126,8 +135,8 @@
 		(let* ((proc (lambda (e) (format t "~a " e))) (ans (map nil proc xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs)))) 
-				'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp)
-				:initial-value t))
+				'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp
+				seqops:for-each-f seqops:for-each-u) :initial-value t))
 			)))
 |#
 
@@ -141,7 +150,9 @@
 					(equal ans-remove (funcall fn-remove pred xs)))))
 				'((seqops:filter-r . seqops:remove-r)
 				(seqops:filter-i . seqops:remove-i)
-				(seqops:filter-lp . seqops:remove-lp)) :initial-value t))
+				(seqops:filter-lp . seqops:remove-lp)
+				(seqops:filter-f . seqops:remove-f)
+				(seqops:filter-u . seqops:remove-u)) :initial-value t))
 			)))
 
 (5am:test (prop-fold-left)
@@ -195,8 +206,8 @@
 			(ans (funcall verify xs cmp)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs :cmp cmp)))) 
-				'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp)
-				:initial-value t))
+				'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp
+				seqops:is-ordered-f seqops:is-ordered-u) :initial-value t))
 			)))
 
 
@@ -205,8 +216,8 @@
 		(let* ((ans (append xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:append-r seqops:append-i seqops:append-lp)
-				:initial-value t))
+				'(seqops:append-r seqops:append-i seqops:append-lp
+				seqops:append-f seqops:append-u) :initial-value t))
 			)))
 
 (5am:test (prop-interleave)
@@ -216,8 +227,8 @@
 				(ans (append (mapcan (lambda (x y) (list x y)) xs ys) extra)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp)
-				:initial-value t))
+				'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp
+				seqops:interleave-f seqops:interleave-u) :initial-value t))
 			)))
 
 (5am:test (prop-map2)
@@ -225,8 +236,8 @@
 		(let* ((proc (lambda (e1 e2) (+ e1 e2 2))) (ans (mapcar proc xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs ys)))) 
-				'(seqops:map2-r seqops:map2-i seqops:map2-lp)
-				:initial-value t))
+				'(seqops:map2-r seqops:map2-i seqops:map2-lp seqops:map2-f
+				seqops:map2-u) :initial-value t))
 			)))
 
 (5am:test (prop-zip)
@@ -234,8 +245,8 @@
 		(let* ((ans (mapcar #'list xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:zip-r seqops:zip-i seqops:zip-lp)
-				:initial-value t))
+				'(seqops:zip-r seqops:zip-i seqops:zip-lp seqops:zip-f
+				seqops:zip-u) :initial-value t))
 			)))
 
 (5am:test (prop-unzip)
@@ -243,8 +254,7 @@
 		(let* ((zlst (mapcar #'list xs ys)) (ans (values (mapcar #'car zlst) (mapcar #'cadr zlst))))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f zlst)))) 
-				'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m)
-				:initial-value t))
+				'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m seqops:unzip-f seqops:unzip-u) :initial-value t))
 			)))
 
 (5am:test (prop-concat)
@@ -252,6 +262,7 @@
 		(let* ((ans (apply #'concatenate 'list nlst)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f nlst)))) 
-				'(seqops:concat-r seqops:concat-i seqops:concat-lp seqops:concat-a)
+				'(seqops:concat-r seqops:concat-i seqops:concat-lp 
+				seqops:concat-a seqops:concat-f seqops:concat-u)
 				:initial-value t))
 			)))

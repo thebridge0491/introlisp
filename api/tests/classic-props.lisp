@@ -19,8 +19,9 @@
 	(5am:for-all ((x (5am:gen-integer :min 1 :max 20)))
 		(let* ((n (float x)) (ans (expt n 2.0)))
 			(5am:is (reduce (lambda (a f)
-				(and a (util:in-epsilon (* +epsilon+ ans) ans (funcall f n))))
-				'(classic:square-r classic:square-i classic:square-lp) 
+				(and a (util:in-epsilon ans (funcall f n) (* +epsilon+ ans))))
+				'(classic:square-r classic:square-i classic:square-lp 
+				classic:square-f classic:square-u) 
 				:initial-value t)))))
 
 (5am:test (prop-expt)
@@ -28,10 +29,11 @@
 			(y (5am:gen-integer :min 2 :max 10)))
 		(let* ((b (float x)) (n (float y)) (ans (expt b n)))
 		(5am:is (reduce (lambda (a f)
-			(and a (util:in-epsilon (* +epsilon+ ans) ans (funcall f b n))))
+			(and a (util:in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
 			'(classic:expt-r classic:expt-i classic:expt-lp
 			classic:fast-expt-r classic:fast-expt-i 
-			classic:fast-expt-lp) :initial-value t)))))
+			classic:fast-expt-lp classic:expt-f classic:expt-u) 
+			:initial-value t)))))
 
 (5am:test (prop-sum-to)
     (5am:for-all ((hi (5am:gen-integer :min 0 :max 18))
@@ -40,15 +42,17 @@
 			:initial-value lo)))
 		(5am:is (reduce (lambda (a f)
 			(and a (= ans (funcall f hi lo))))
-			'(classic:sum-to-r classic:sum-to-i classic:sum-to-lp) 
-			:initial-value t)))))
+			'(classic:sum-to-r classic:sum-to-i classic:sum-to-lp 
+			classic:sum-to-f classic:sum-to-u) :initial-value t)))))
 
 (5am:test (prop-fact)
     (5am:for-all ((n (5am:gen-integer :min 0 :max 18)))
 		(let* ((ans (reduce #'* (util:range-cnt 1 n) :initial-value 1)))
 		(5am:is (reduce (lambda (a f)
 			(and a (= ans (funcall f n))))
-			'(classic:fact-r classic:fact-i classic:fact-lp) :initial-value t)))))
+			'(classic:fact-r classic:fact-i classic:fact-lp classic:fact-f
+			classic:fact-u)
+			:initial-value t)))))
 
 (5am:test (prop-fib)
     (5am:for-all ((n (5am:gen-integer :min 0 :max 20)))
@@ -57,7 +61,8 @@
 				:initial-value '(0 . 1)))))
 		(5am:is (reduce (lambda (a f)
 			(and a (= ans (funcall f n))))
-			'(classic:fib-r classic:fib-i classic:fib-lp) :initial-value t)))))
+			'(classic:fib-r classic:fib-i classic:fib-lp classic:fib-f
+			classic:fib-u) :initial-value t)))))
 
 (5am:test (prop-pascaltri)
     (5am:for-all ((rows (5am:gen-integer :min 0 :max 10)))
@@ -67,7 +72,9 @@
 				:initial-value '((1))))))
 		(5am:is (reduce (lambda (a f)
 			(and a (equal ans (funcall f rows))))
-			'(classic:pascaltri-mult classic:pascaltri-add) :initial-value t)))))
+			'(classic:pascaltri-mult classic:pascaltri-add classic:pascaltri-f
+			classic:pascaltri-u)
+			:initial-value t)))))
 
 (5am:test (prop-quot-rem)
     (5am:for-all ((a (5am:gen-integer :min -10 :max 10))
@@ -86,7 +93,9 @@
 				(= ans-l (apply fn-lcm nums)))))
 			'((classic:gcd-r . classic:lcm-r)
 			(classic:gcd-i . classic:lcm-i)
-			(classic:gcd-lp . classic:lcm-lp)) :initial-value t)))))
+			(classic:gcd-lp . classic:lcm-lp)
+			(classic:gcd-f . classic:lcm-f)
+			(classic:gcd-u . classic:lcm-u)) :initial-value t)))))
 
 (5am:test (prop-base-expand)
     (5am:for-all ((base (5am:gen-integer :min 2 :max 16))
@@ -97,7 +106,9 @@
 		(5am:is (reduce (lambda (a f)
 			(and a (or (equal ans (funcall f base num))
 				(equal (cdr ans) (funcall f base num)))))
-				'(classic:base-expand-r classic:base-expand-i classic:base-expand-lp) :initial-value t)))))
+				'(classic:base-expand-r classic:base-expand-i 
+				classic:base-expand-lp classic:base-expand-f
+				classic:base-expand-u) :initial-value t)))))
 
 (5am:test (prop-base-to10)
     (let ((base (+ (random 15) 2)))
@@ -107,7 +118,8 @@
 			(ans (reduce corp (mapcar #'list (util:range-cnt 0 (length nums)) (reverse nums)) :initial-value 0)))
 		(5am:is (reduce (lambda (a f)
 			(and a (equal ans (funcall f base nums))))
-			'(classic:base-to10-r classic:base-to10-i classic:base-to10-lp) :initial-value t))))))
+			'(classic:base-to10-r classic:base-to10-i classic:base-to10-lp
+			classic:base-to10-f classic:base-to10-u) :initial-value t))))))
 
 (5am:test (prop-range)
     (5am:for-all ((stop (5am:gen-integer :min 0 :max 18))
@@ -122,7 +134,9 @@
 				(equal ans-neg (funcall fn-rgStep start stop :step -1)))))
 			'((classic:range-r . classic:range-step-r)
 				(classic:range-i . classic:range-step-i)
-				(classic:range-lp . classic:range-step-lp))
+				(classic:range-lp . classic:range-step-lp)
+				(classic:range-f . classic:range-step-f)
+				(classic:range-u . classic:range-step-u))
 				:initial-value t)))))
 
 (5am:test (prop-compose)
@@ -132,8 +146,9 @@
 			(ans-len (length (funcall fn-iota x)))
 			(ans-sqrt (sqrt (funcall fn-square y))))
 		(5am:is (reduce (lambda (a f)
-			(and a (util:in-epsilon (* +epsilon+ ans-sqrt) ans-sqrt 
-				(funcall (funcall f #'sqrt fn-square) y))
+			(and a (util:in-epsilon ans-sqrt 
+				(funcall (funcall f #'sqrt fn-square) y) (* +epsilon+ ans-sqrt))
 				(equal ans-len (funcall (funcall f #'length fn-iota) x))
 				(equal (util:range-cnt 0 x) (funcall (funcall f fn-iota) x))))
-			'(classic:compose-r classic:compose-i classic:compose-lp) :initial-value t)))))
+			'(classic:compose-r classic:compose-i classic:compose-lp
+			classic:compose-f classic:compose-u) :initial-value t)))))

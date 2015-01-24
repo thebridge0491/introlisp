@@ -21,7 +21,8 @@
 			(ans (mapcar func (util:range-cnt 0 len))))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f func len))))
-			'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp))))
+			'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp
+			seqops:tabulate-f seqops:tabulate-u))))
 		'(0 5 10)))
 
 (5am:test (test-length :fixture fixc-sequenceops)
@@ -29,7 +30,8 @@
 		(let* ((xs (util:range-cnt 0 len)) (ans (length xs)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f xs))))
-			'(seqops:length-r seqops:length-i seqops:length-lp))))
+			'(seqops:length-r seqops:length-i seqops:length-lp
+			seqops:length-f seqops:length-u))))
 		'(3 5 7)))
 
 (5am:test (test-nth :fixture fixc-sequenceops)
@@ -37,7 +39,8 @@
 		(5am:is (equal (nth 3 lst) (funcall f 3 lst)))
 		(5am:is (equal (nth 3 revlst) (funcall f 3 revlst)))
 		nil))
-		'(seqops:nth-r seqops:nth-i seqops:nth-lp)))
+		'(seqops:nth-r seqops:nth-i seqops:nth-lp seqops:nth-f
+		seqops:nth-u)))
 
 (5am:test (test-index-find :fixture fixc-sequenceops)
 	(mapcar (lambda (tup)
@@ -47,7 +50,9 @@
 			(5am:is (equal (position el revlst) (funcall fn-idx pred revlst)))
 			(5am:is (equal (find-if pred lst) (funcall fn-find pred lst)))
 			(5am:is (equal (find-if pred revlst) (funcall fn-find pred revlst)))))
-		'((seqops:index-r . seqops:find-r) (seqops:index-i . seqops:find-i) (seqops:index-lp . seqops:find-lp))))
+		'((seqops:index-r . seqops:find-r) (seqops:index-i . seqops:find-i) (seqops:index-lp . seqops:find-lp)
+		(seqops:index-f . seqops:find-f)
+		(seqops:index-u . seqops:find-u))))
 
 (5am:test (test-min-max :fixture fixc-sequenceops)
 	(mapcar (lambda (tup)
@@ -56,21 +61,24 @@
 			(5am:is (equal (apply #'min revlst) (apply fn-min revlst)))
 			(5am:is (equal (apply #'max lst) (apply fn-max lst)))
 			(5am:is (equal (apply #'max revlst) (apply fn-max revlst)))))
-		'((seqops:min-r . seqops:max-r) (seqops:min-i . seqops:max-i) (seqops:min-lp . seqops:max-lp))))
+		'((seqops:min-r . seqops:max-r) (seqops:min-i . seqops:max-i) (seqops:min-lp . seqops:max-lp) (seqops:min-f . seqops:max-f)
+		(seqops:min-u . seqops:max-u))))
 
 (5am:test (test-reverse :fixture fixc-sequenceops)
     (mapcar (lambda (f) (progn
 		(5am:is (equal revlst (funcall f lst)))
 		(5am:is (equal lst (funcall f revlst)))
 		nil))
-		'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp)))
+		'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp
+		seqops:reverse-f seqops:reverse-u)))
 
 (5am:test (test-copy :fixture fixc-sequenceops)
     (mapcar (lambda (f) (progn
 		(5am:is (equal lst (funcall f lst)))
 		(5am:is (equal revlst (funcall f revlst)))
 		nil))
-		'(seqops:copy-r seqops:copy-i seqops:copy-lp)))
+		'(seqops:copy-r seqops:copy-i seqops:copy-lp seqops:copy-f
+		seqops:copy-u)))
 
 (5am:test (test-take-drop :fixture fixc-sequenceops)
     (mapcar (lambda (tup)
@@ -80,7 +88,8 @@
 		(5am:is (equal (nthcdr 3 lst) (funcall fn-drop 3 lst)))
 		(5am:is (equal (nthcdr 3 revlst) (funcall fn-drop 3 revlst)))
 		))
-		'((seqops:take-i . seqops:drop-i) (seqops:take-lp . seqops:drop-lp))))
+		'((seqops:take-i . seqops:drop-i) (seqops:take-lp . seqops:drop-lp)
+		(seqops:take-f . seqops:drop-f) (seqops:take-u . seqops:drop-u))))
 
 (5am:test (test-any-every :fixture fixc-sequenceops)
 	(mapcar (lambda (tup)
@@ -99,14 +108,17 @@
 			(5am:is (equal (every #'listp '(0 (1) (#\a)))
 				(funcall fn-every #'listp '(0 (1) (#\a)))))))
 		'((seqops:any-r . seqops:every-r) (seqops:any-i . seqops:every-i)
-			(seqops:any-lp . seqops:every-lp))))
+			(seqops:any-lp . seqops:every-lp)
+			(seqops:any-f . seqops:every-f)
+			(seqops:any-u . seqops:every-u))))
 
 (5am:test (test-map :fixture fixc-sequenceops)
 	(mapcar (lambda (xs)
 		(let* ((proc (lambda (e) (+ e 2))) (ans (mapcar proc xs)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f proc xs))))
-			'(seqops:map-r seqops:map-i seqops:map-lp))))
+			'(seqops:map-r seqops:map-i seqops:map-lp seqops:map-f
+			seqops:map-u))))
 		(list lst revlst)))
 
 (5am:test (test-for-each :fixture fixc-sequenceops)
@@ -114,7 +126,8 @@
 		(let* ((proc (lambda (e) (format t "~a " e))) (ans (map nil proc xs)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f proc xs))))
-			'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp))))
+			'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp
+			seqops:for-each-f seqops:for-each-u))))
 		(list lst revlst)))
 
 (5am:test (test-filter-remove :fixture fixc-sequenceops)
@@ -128,7 +141,9 @@
 			))
 			'((seqops:filter-r . seqops:remove-r)
 				(seqops:filter-i . seqops:remove-i)
-				(seqops:filter-lp . seqops:remove-lp))))
+				(seqops:filter-lp . seqops:remove-lp)
+				(seqops:filter-f . seqops:remove-f)
+				(seqops:filter-u . seqops:remove-u))))
 		(list lst revlst)))
 
 (5am:test (test-fold-left :fixture fixc-sequenceops)
@@ -190,7 +205,8 @@
 		(mapcar (lambda (f)
 			(5am:is (equal ans1 (funcall f xs :cmp cmp1)))
 			(5am:is (equal ans2 (funcall f xs :cmp cmp2))))
-			'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp))))
+			'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp
+			seqops:is-ordered-f seqops:is-ordered-u))))
 		(list lst revlst)))
 
 
@@ -199,21 +215,24 @@
 		(let* ((nines '(9 9 9 9)) (ans (append xs nines)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f xs nines))))
-			'(seqops:append-r seqops:append-i seqops:append-lp))))
+			'(seqops:append-r seqops:append-i seqops:append-lp
+			seqops:append-f seqops:append-u))))
 		(list lst revlst)))
 
 (5am:test (test-interleave :fixture fixc-sequenceops)
 	(mapcar (lambda (f)
 		(5am:is (equal '(0 9 1 9 2 9 3 9 4) (funcall f lst '(9 9 9 9))))
 		(5am:is (equal '(4 9 3 9 2 9 1 9 0) (funcall f revlst '(9 9 9 9)))))
-		'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp)))
+		'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp
+		seqops:interleave-f seqops:interleave-u)))
 
 (5am:test (test-map2 :fixture fixc-sequenceops)
 	(mapcar (lambda (xs)
 		(let* ((proc (lambda (e1 e2) (+ e1 e2 2))) (ans (mapcar proc xs xs)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f proc xs xs))))
-			'(seqops:map2-r seqops:map2-i seqops:map2-lp))))
+			'(seqops:map2-r seqops:map2-i seqops:map2-lp seqops:map2-f
+			seqops:map2-u))))
 		(list lst revlst)))
 
 (5am:test (test-zip :fixture fixc-sequenceops)
@@ -221,7 +240,8 @@
 	(mapcar (lambda (f)
 		(5am:is (equal (mapcar #'list lst1 lst2) (funcall f lst1 lst2)))
 		(5am:is (equal (mapcar #'list lst3 lst2) (funcall f lst3 lst2))))
-		'(seqops:zip-r seqops:zip-i seqops:zip-lp))))
+		'(seqops:zip-r seqops:zip-i seqops:zip-lp seqops:zip-f
+		seqops:zip-u))))
 
 (5am:test (test-unzip :fixture fixc-sequenceops)
 	(let ((zlst1 '((0 20) (1 30))) (zlst2 '((0 20) (1 30) (#\a #\b)))
@@ -230,7 +250,8 @@
 		(5am:is (multiple-value-bind (xs ys) (funcall f zlst1) (and (equal lst1 xs) (equal lst2 ys))))
 		(5am:is (multiple-value-bind (xs ys) (funcall f zlst2) (and (equal lst3 xs) (equal lst4 ys))))
 		)
-		'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m))))
+		'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m seqops:unzip-f
+		seqops:unzip-u))))
 
 (5am:test (test-concat :fixture fixc-sequenceops)
 	(let ((nlst1 '((0 1 2) (20 30))) (nlst2 '((0 (1 #\a)) (20 (30)))))
@@ -238,4 +259,5 @@
 		(5am:is (equal (apply #'concatenate 'list nlst1) (funcall f nlst1)))
 		(5am:is (equal (apply #'concatenate 'list nlst2) (funcall f nlst2)))
 		)
-		'(seqops:concat-r seqops:concat-i seqops:concat-lp seqops:concat-a))))
+		'(seqops:concat-r seqops:concat-i seqops:concat-lp seqops:concat-a
+		seqops:concat-f seqops:concat-u))))

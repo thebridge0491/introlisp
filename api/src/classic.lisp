@@ -6,7 +6,7 @@
 
 (defpackage :introlisp.practice/src/classic
     (:documentation "Practice.Classic library")
-    (:use :cl :log4cl)
+    (:use :cl :introlisp.practice/src/classic-hiorder)
     (:nicknames :introlisp.practice.classic)
     (:export :square-r :square-i :square-lp :expt-r :expt-i :expt-lp
 		:fast-expt-r :fast-expt-i :fast-expt-lp :sum-to-r :sum-to-i :sum-to-lp
@@ -16,6 +16,12 @@
 		:base-to10-r :base-to10-i :base-to10-lp :range-step-r :range-step-i
 		:range-step-lp :range-r :range-i :range-lp :compose-r :compose-i
 		:compose-lp
+		
+		:square-f :expt-f :sum-to-f :fact-f :fib-f :pascaltri-f :gcd-f :lcm-f
+		:base-expand-f :base-to10-f :range-step-f :range-f :compose-f
+		
+		:square-u :expt-u :sum-to-u :fact-u :fib-u :pascaltri-u :gcd-u :lcm-u
+		:base-expand-u :base-to10-u :range-step-u :range-u :compose-u
 		)
     )
 (in-package :introlisp.practice/src/classic)

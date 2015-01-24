@@ -6,7 +6,7 @@
 
 (defpackage :introlisp.practice/src/sequenceops
     (:documentation "Practice.Sequenceops library")
-    (:use :cl :log4cl)
+    (:use :cl :introlisp.practice/src/sequenceops-hiorder)
     (:nicknames :introlisp.practice.sequenceops)
     (:export :tabulate-r :tabulate-i :tabulate-lp :length-r :length-i 
 		:length-lp :nth-r :nth-i :nth-lp :index-r :index-i :index-lp
@@ -28,6 +28,22 @@
 		:interleave-lp :map2-r :map2-i :map2-lp :zip-r :zip-i :zip-lp
 		:unzip-i :unzip-lp :unzip-m :concat-r :concat-i :concat-lp
 		:concat-a
+		
+		:tabulate-f :length-f :nth-f :index-f :find-f :min-f :max-f :reverse-f
+		:copy-f :split-at-f :take-f :drop-f :any-f :every-f :map-f :for-each-f
+		:partition-f :filter-f :remove-f
+		
+		:is-ordered-f
+		
+		:append-f :interleave-f :map2-f :zip-f :unzip-f :concat-f
+		
+		:tabulate-u :length-u :nth-u :index-u :find-u :min-u :max-u
+		:reverse-u :copy-u :split-at-u :take-u :drop-u :any-u :every-u
+		:map-u :for-each-u :partition-u :filter-u :remove-u 
+		
+		:is-ordered-u
+		
+		:append-u :interleave-u :map2-u :zip-u :unzip-u :concat-u
 		)
     )
 (in-package :introlisp.practice/src/sequenceops)
