@@ -6,7 +6,8 @@
 
 (defpackage :introlisp.practice/src/classic
     (:documentation "Practice.Classic library")
-    (:use :cl :introlisp.practice/src/classic-hiorder)
+    (:use :cl :introlisp.practice/src/classic-hiorder
+		:introlisp.practice/src/classic-streams)
     (:nicknames :introlisp.practice.classic)
     (:export :square-r :square-i :square-lp :expt-r :expt-i :expt-lp
 		:fast-expt-r :fast-expt-i :fast-expt-lp :sum-to-r :sum-to-i :sum-to-lp
@@ -22,6 +23,12 @@
 		
 		:square-u :expt-u :sum-to-u :fact-u :fib-u :pascaltri-u :gcd-u :lcm-u
 		:base-expand-u :base-to10-u :range-step-u :range-u :compose-u
+		
+		:squares-strm :squares-map2 :expts-strm :expts-map2 :sums-strm 
+		:sums-map2 :facts-strm :facts-map2 :fibs-strm :fibs-map2
+		:pascalrows-strm :pascalrows-map2
+		
+		:squares-su :expts-su :sums-su :facts-su :fibs-su :pascalrows-su
 		)
     )
 (in-package :introlisp.practice/src/classic)

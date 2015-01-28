@@ -6,7 +6,8 @@
 
 (defpackage :introlisp.practice/src/sequenceops
     (:documentation "Practice.Sequenceops library")
-    (:use :cl :introlisp.practice/src/sequenceops-hiorder)
+    (:use :cl :introlisp.practice/src/sequenceops-hiorder
+		:introlisp.practice/src/sequenceops-variadic)
     (:nicknames :introlisp.practice.sequenceops)
     (:export :tabulate-r :tabulate-i :tabulate-lp :length-r :length-i 
 		:length-lp :nth-r :nth-i :nth-lp :index-r :index-i :index-lp
@@ -44,6 +45,16 @@
 		:is-ordered-u
 		
 		:append-u :interleave-u :map2-u :zip-u :unzip-u :concat-u
+		
+		:any-rv :any-iv :any-lpv :every-rv :every-iv :every-lpv 
+		:map-rv :map-iv :map-lpv :for-each-rv :for-each-iv :for-each-lpv
+		:fold-left-rv :fold-left-iv :fold-left-lpv :fold-right-rv 
+		:fold-right-iv :fold-right-lpv
+		:append-rv :append-iv :append-lpv :zip-rv :zip-iv :zip-lpv
+		
+		:any-fv :every-fv :map-fv :for-each-fv :append-fv :zip-fv
+		
+		:any-uv :every-uv :map-uv :for-each-uv :append-uv :zip-uv
 		)
     )
 (in-package :introlisp.practice/src/sequenceops)

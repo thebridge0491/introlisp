@@ -21,8 +21,14 @@
 		(mapcar (lambda (f)
 			(5am:is (util:in-epsilon ans (funcall f n) (* +epsilon+ ans))))
 			'(classic:square-r classic:square-i classic:square-lp
-			classic:square-f classic:square-u))))
-		'(2.0 11.0 20.0)))
+			classic:square-f classic:square-u))
+		(mapcar (lambda (f)
+			(5am:is (util:in-epsilon ans
+				(lazy:head (lazy-seqs:drop (floor n) (funcall f)))
+				(* +epsilon+ ans))))
+			'(classic:squares-strm classic:squares-map2
+			classic:squares-su))
+		)) '(2.0 11.0 20.0)))
 
 (5am:test (test-expt :fixture fixc-classic)
 	(mapcar (lambda (tup)
@@ -31,20 +37,29 @@
 			(5am:is (util:in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
 			'(classic:expt-r classic:expt-i classic:expt-lp
 				classic:fast-expt-r classic:fast-expt-i classic:fast-expt-lp 
-				classic:expt-f classic:expt-u))))
-		(util:cartesian-prod '(2.0 11.0 20.0) '(3.0 6.0 10.0))))
+				classic:expt-f classic:expt-u))
+		(mapcar (lambda (f)
+			(5am:is (util:in-epsilon ans
+				(lazy:head (lazy-seqs:drop (floor n) (funcall f b)))
+				(* +epsilon+ ans))))
+			'(classic:expts-strm classic:expts-map2 classic:expts-su))
+		)) (util:cartesian-prod '(2.0 11.0 20.0) '(3.0 6.0 10.0))))
 
 (5am:test (test-sum-to :fixture fixc-classic)
 	(mapcar (lambda (tup)
 		(let* ((hi (car tup)) (lo (cdr tup))
 			(ans (reduce #'+ (util:range-cnt (1+ lo) (- hi lo)) 
 			:initial-value lo)))
-		(5am:is (equal ans (classic:sum-to-u hi lo)))
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f hi lo))))
 			'(classic:sum-to-r classic:sum-to-i classic:sum-to-lp 
-			classic:sum-to-f classic:sum-to-u))))
-		(util:cartesian-prod '(15 0 150) '(-20 0 -10))))
+			classic:sum-to-f classic:sum-to-u))
+		(mapcar (lambda (f)
+			(5am:is (= (reduce #'+ (util:range-cnt (1+ lo) (- hi lo)) 
+				:initial-value lo) (lazy:head (lazy-seqs:drop (floor (- hi lo))
+				(funcall f lo))))))
+			'(classic:sums-strm classic:sums-map2 classic:sums-su))
+		)) (util:cartesian-prod '(15 0 150) '(-20 0 -10))))
 
 (5am:test (test-fact :fixture fixc-classic)
 	(mapcar (lambda (n)
@@ -52,8 +67,11 @@
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f n))))
 			'(classic:fact-r classic:fact-i classic:fact-lp 
-			classic:fact-f classic:fact-u))))
-		'(0 9 18)))
+			classic:fact-f classic:fact-u))
+		(mapcar (lambda (f)
+			(5am:is (= ans (lazy:head (lazy-seqs:drop n (funcall f))))))
+			'(classic:facts-strm classic:facts-map2 classic:facts-su))
+		)) '(0 9 18)))
 
 (5am:test (test-fib :fixture fixc-classic)
 	(mapcar (lambda (n)
@@ -63,8 +81,11 @@
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f n))))
 			'(classic:fib-r classic:fib-i classic:fib-lp classic:fib-f
-			classic:fib-u))))
-		'(0 10 20)))
+			classic:fib-u))
+		(mapcar (lambda (f)
+			(5am:is (= ans (lazy:head (lazy-seqs:drop n (funcall f))))))
+			'(classic:fibs-strm classic:fibs-map2 classic:fibs-su))
+		)) '(0 10 20)))
 
 (5am:test (test-pascaltri :fixture fixc-classic)
 	(mapcar (lambda (rows)
@@ -75,8 +96,12 @@
 		(mapcar (lambda (f)
 			(5am:is (equalp ans (funcall f rows))))
 			'(classic:pascaltri-mult classic:pascaltri-add 
-			classic:pascaltri-f classic:pascaltri-u))))
-		'(0 5 10)))
+			classic:pascaltri-f classic:pascaltri-u))
+		(mapcar (lambda (f)
+			(5am:is (equalp ans (lazy-seqs:take (1+ rows) (funcall f)))))
+			'(classic:pascalrows-strm classic:pascalrows-map2
+			classic:pascalrows-su))
+		)) '(0 5 10)))
 
 (5am:test (test-quot-rem :fixture fixc-classic)
 	(mapcar (lambda (tup)
