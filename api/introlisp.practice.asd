@@ -24,6 +24,7 @@
   :serial t
   :depends-on (:introlisp.practice/core
                :log4cl
+               :clazy
               )
 #|
   :components ((:module "src"

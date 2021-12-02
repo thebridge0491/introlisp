@@ -21,8 +21,8 @@
 				(ans (mapcar func (util:range-cnt 0 len))))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f func len)))) 
-				'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp)
-				:initial-value t))
+				'(seqops:tabulate-r seqops:tabulate-i seqops:tabulate-lp
+				seqops:tabulate-f seqops:tabulate-u) :initial-value t))
 			)))
 
 (5am:test (prop-length)
@@ -30,9 +30,8 @@
 		(let* ((ans (length xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs)))) 
-				'(seqops:length-r seqops:length-i seqops:length-lp) 
-				:initial-value t))
-			)))
+				'(seqops:length-r seqops:length-i seqops:length-lp
+				seqops:length-f seqops:length-u) :initial-value t)))))
 
 (5am:test (prop-nth)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 1 :max 20)))
@@ -41,7 +40,8 @@
 		(let* ((ans (nth ndx xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f ndx xs)))) 
-				'(seqops:nth-r seqops:nth-i seqops:nth-lp) :initial-value t))
+				'(seqops:nth-r seqops:nth-i seqops:nth-lp seqops:nth-f
+				seqops:nth-u) :initial-value t))
 			)
 		(5am:is (equal t t)))))
 
@@ -56,7 +56,9 @@
 					(equal ans-find (funcall fn-find pred xs)))))
 				'((seqops:index-r . seqops:find-r)
 				(seqops:index-i . seqops:find-i)
-				(seqops:index-lp . seqops:find-lp)) :initial-value t))
+				(seqops:index-lp . seqops:find-lp)
+				(seqops:index-f . seqops:find-f)
+				(seqops:index-u . seqops:find-u)) :initial-value t))
 			)))
 
 (5am:test (prop-min-max)
@@ -67,23 +69,25 @@
 				(and a (equal ans-min (apply fn-min xs))
 					(equal ans-max (apply fn-max xs)))))
 				'((seqops:min-r . seqops:max-r) (seqops:min-i . seqops:max-i) 
-				(seqops:min-lp . seqops:max-lp)) :initial-value t)))))
+				(seqops:min-lp . seqops:max-lp)
+				(seqops:min-f . seqops:max-f)
+				(seqops:min-u . seqops:max-u)) :initial-value t)))))
 
 (5am:test (prop-reverse)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
 		(let* ((ans (reverse xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs))))
-				'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp) 
-				:initial-value t)))))
+				'(seqops:reverse-r seqops:reverse-i seqops:reverse-lp
+				seqops:reverse-f seqops:reverse-u) :initial-value t)))))
 
 (5am:test (prop-copy)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
 		(let* ((ans (copy-seq xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs))))
-				'(seqops:copy-r seqops:copy-i seqops:copy-lp)
-				:initial-value t)))))
+				'(seqops:copy-r seqops:copy-i seqops:copy-lp seqops:copy-f
+				seqops:copy-u) :initial-value t)))))
 
 (5am:test (prop-take-drop)
 	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
@@ -95,7 +99,9 @@
 				(and a (equal ans-take (funcall fn-take n xs))
 					(equal ans-drop (funcall fn-drop n xs)))))
 				'((seqops:take-i . seqops:drop-i) 
-				(seqops:take-lp . seqops:drop-lp)) :initial-value t))
+				(seqops:take-lp . seqops:drop-lp)
+				(seqops:take-f . seqops:drop-f)
+				(seqops:take-u . seqops:drop-u)) :initial-value t))
 			)
 		(5am:is (equal t t)))))
 
@@ -109,7 +115,9 @@
 					(equal ans-every (funcall fn-every pred xs)))))
 				'((seqops:any-r . seqops:every-r)
 				(seqops:any-i . seqops:every-i)
-				(seqops:any-lp . seqops:every-lp)) :initial-value t))
+				(seqops:any-lp . seqops:every-lp)
+				(seqops:any-f . seqops:every-f)
+				(seqops:any-u . seqops:every-u)) :initial-value t))
 			)))
 
 (5am:test (prop-map)
@@ -117,8 +125,8 @@
 		(let* ((proc (lambda (e) (+ e 2))) (ans (mapcar proc xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs)))) 
-				'(seqops:map-r seqops:map-i seqops:map-lp)
-				:initial-value t))
+				'(seqops:map-r seqops:map-i seqops:map-lp seqops:map-f
+				seqops:map-u) :initial-value t))
 			)))
 #|
 (5am:test (prop-for-each)
@@ -126,8 +134,8 @@
 		(let* ((proc (lambda (e) (format t "~a " e))) (ans (map nil proc xs)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs)))) 
-				'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp)
-				:initial-value t))
+				'(seqops:for-each-r seqops:for-each-i seqops:for-each-lp
+				seqops:for-each-f seqops:for-each-u) :initial-value t))
 			)))
 |#
 
@@ -141,7 +149,9 @@
 					(equal ans-remove (funcall fn-remove pred xs)))))
 				'((seqops:filter-r . seqops:remove-r)
 				(seqops:filter-i . seqops:remove-i)
-				(seqops:filter-lp . seqops:remove-lp)) :initial-value t))
+				(seqops:filter-lp . seqops:remove-lp)
+				(seqops:filter-f . seqops:remove-f)
+				(seqops:filter-u . seqops:remove-u)) :initial-value t))
 			)))
 
 (5am:test (prop-fold-left)
@@ -195,7 +205,8 @@
 			(ans (funcall verify xs cmp)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs :cmp cmp)))) 
-				'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp)
+				'(seqops:is-ordered-r seqops:is-ordered-i seqops:is-ordered-lp
+				seqops:is-ordered-f seqops:is-ordered-u)
 				:initial-value t))
 			)))
 
@@ -205,8 +216,8 @@
 		(let* ((ans (append xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:append-r seqops:append-i seqops:append-lp)
-				:initial-value t))
+				'(seqops:append-r seqops:append-i seqops:append-lp
+				seqops:append-f seqops:append-u) :initial-value t))
 			)))
 
 (5am:test (prop-interleave)
@@ -216,7 +227,8 @@
 				(ans (append (mapcan (lambda (x y) (list x y)) xs ys) extra)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp)
+				'(seqops:interleave-r seqops:interleave-i seqops:interleave-lp
+				seqops:interleave-f seqops:interleave-u)
 				:initial-value t))
 			)))
 
@@ -225,8 +237,8 @@
 		(let* ((proc (lambda (e1 e2) (+ e1 e2 2))) (ans (mapcar proc xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f proc xs ys)))) 
-				'(seqops:map2-r seqops:map2-i seqops:map2-lp)
-				:initial-value t))
+				'(seqops:map2-r seqops:map2-i seqops:map2-lp seqops:map2-f
+				seqops:map2-u) :initial-value t))
 			)))
 
 (5am:test (prop-zip)
@@ -234,8 +246,8 @@
 		(let* ((ans (mapcar #'list xs ys)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f xs ys)))) 
-				'(seqops:zip-r seqops:zip-i seqops:zip-lp)
-				:initial-value t))
+				'(seqops:zip-r seqops:zip-i seqops:zip-lp seqops:zip-f
+				seqops:zip-u) :initial-value t))
 			)))
 
 (5am:test (prop-unzip)
@@ -243,7 +255,7 @@
 		(let* ((zlst (mapcar #'list xs ys)) (ans (values (mapcar #'car zlst) (mapcar #'cadr zlst))))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f zlst)))) 
-				'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m)
+				'(seqops:unzip-i seqops:unzip-lp seqops:unzip-m seqops:unzip-f seqops:unzip-u)
 				:initial-value t))
 			)))
 
@@ -252,6 +264,129 @@
 		(let* ((ans (apply #'concatenate 'list nlst)))
 			(5am:is (reduce (lambda (a f)
 				(and a (equal ans (funcall f nlst)))) 
-				'(seqops:concat-r seqops:concat-i seqops:concat-lp seqops:concat-a)
+				'(seqops:concat-r seqops:concat-i seqops:concat-lp 
+				seqops:concat-a seqops:concat-f seqops:concat-u)
 				:initial-value t))
+			)))
+
+
+(5am:test (prop-any-every-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((pred-any2 (lambda (e1 e2) (or (evenp e1) (evenp e2))))
+			(pred-any3 (lambda (e1 e2 e3) (or (evenp e1) (evenp e2)
+				(evenp e3))))
+			(pred-every2 (lambda (e1 e2) (and (oddp e1) (oddp e2))))
+			(pred-every3 (lambda (e1 e2 e3) (and (oddp e1) (oddp e2)
+				(oddp e3))))
+			(ans-any2 (some pred-any2 xs ys))
+			(ans-any3 (some pred-any3 xs ys zs))
+			(ans-every2 (every pred-every2 xs ys))
+			(ans-every3 (every pred-every3 xs ys zs)))
+			(5am:is (reduce (lambda (a tup) (let* ((fn-any (car tup))
+					(fn-every (cdr tup)))
+				(and a (equal ans-any2 (funcall fn-any pred-any2 xs ys))
+					(equal ans-any3 (funcall fn-any pred-any3 xs ys zs))
+					(equal ans-every2 (funcall fn-every pred-every2 xs ys))
+					(equal ans-every3
+						(funcall fn-every pred-every3 xs ys zs)))))
+				'((seqops:any-rv . seqops:every-rv)
+				(seqops:any-iv . seqops:every-iv)
+				(seqops:any-lpv . seqops:every-lpv)
+				(seqops:any-fv . seqops:every-fv)
+				(seqops:any-uv . seqops:every-uv)) :initial-value t))
+			)))
+
+(5am:test (prop-map-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((proc2 (lambda (a b) (list (+ a 2) (+ b 2))))
+			(proc3 (lambda (a b c) (list (+ a 2) (+ b 2) (+ c 2))))
+			(ans2 (mapcar proc2 xs ys)) (ans3 (mapcar proc3 xs ys zs)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans2 (funcall f proc2 xs ys))
+					(equal ans3 (funcall f proc3 xs ys zs)))) 
+				'(seqops:map-rv seqops:map-iv seqops:map-lpv
+				seqops:map-fv seqops:map-uv) 
+				:initial-value t))
+			)))
+#|
+(5am:test (prop-for-each-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((proc2 (lambda (a b) (format t "~a ~a" a b)))
+			(proc3 (lambda (a b c) (format t "~a ~a ~a" a b c))) 
+			(ans2 (map nil proc2 xs ys)) (ans3 (map nil proc3 xs ys zs)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans2 (funcall f proc2 xs ys))
+					(equal ans3 (funcall f proc3 xs ys zs)))) 
+				'(seqops:for-each-rv seqops:for-each-iv seqops:for-each-lpv
+				seqops:for-each-fv seqops:for-each-uv)
+				:initial-value t))
+			)))
+|#
+
+(5am:test (prop-fold-left-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((corp2 (lambda (a e1 e2) (+ a e1 e2)))
+			(corp3 (lambda (a e1 e2 e3) (- a e1 e2 e3)))
+			(ans2 (reduce (lambda (a x-y) (+ a (car x-y) (cadr x-y))) 
+				(mapcar #'list xs ys) :initial-value 0))
+			(ans3 (reduce (lambda (a x-y-z) (- a (car x-y-z) (cadr x-y-z) 
+				(caddr x-y-z))) (mapcar #'list xs ys zs) :initial-value 0)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans2 (funcall f corp2 0 xs ys))
+					(equal ans3 (funcall f corp3 0 xs ys zs)))) 
+				'(seqops:fold-left-rv seqops:fold-left-iv seqops:fold-left-lpv)
+				:initial-value t))
+			)))
+
+(5am:test (prop-fold-right-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((proc2 (lambda (e1 e2 a) (+ (+ e1 e2) a)))
+			(proc3 (lambda (e1 e2 e3 a) (- (+ e1 e2 e3) a)))
+			(ans2 (reduce (lambda (x-y a) (+ (+ (car x-y) (cadr x-y)) a)) 
+				(mapcar #'list xs ys) :initial-value 0 :from-end t))
+			(ans3 (reduce (lambda (x-y-z a) (- (+ (car x-y-z) (cadr x-y-z) 
+				(caddr x-y-z)) a)) (mapcar #'list xs ys zs) :initial-value 0
+				:from-end t)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans2 (funcall f proc2 0 xs ys))
+					(equal ans3 (funcall f proc3 0 xs ys zs)))) 
+				'(seqops:fold-right-rv seqops:fold-right-iv
+				seqops:fold-right-lpv)
+				:initial-value t))
+			)))
+
+(5am:test (prop-append-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((ans2 (append xs ys)) (ans3 (append xs ys zs)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans2 (funcall f xs ys))
+					(equal ans3 (funcall f xs ys zs)))) 
+				'(seqops:append-rv seqops:append-iv seqops:append-lpv
+				seqops:append-fv seqops:append-uv) :initial-value t))
+			)))
+
+(5am:test (prop-zip-v)
+	(5am:for-all ((xs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ys (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(zs (5am:gen-list :length (5am:gen-integer :min 0 :max 20)))
+		(ws (5am:gen-list :length (5am:gen-integer :min 0 :max 20))))
+		(let* ((ans3 (mapcar #'list xs ys zs))
+			(ans4 (mapcar #'list xs ys zs ws)))
+			(5am:is (reduce (lambda (a f)
+				(and a (equal ans3 (funcall f xs ys zs))
+					(equal ans4 (funcall f xs ys zs ws)))) 
+				'(seqops:zip-rv seqops:zip-iv seqops:zip-lpv
+				seqops:zip-fv seqops:zip-uv) :initial-value t))
 			)))

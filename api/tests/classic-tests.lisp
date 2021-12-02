@@ -19,35 +19,59 @@
 	(mapcar (lambda (n)
 		(let* ((ans (expt n 2.0)))
 		(mapcar (lambda (f)
-			(5am:is (util:in-epsilon (* +epsilon+ ans) ans (funcall f n))))
-			'(classic:square-r classic:square-i classic:square-lp))))
-		'(2.0 11.0 20.0)))
+			(5am:is (util:in-epsilon ans (funcall f n) (* +epsilon+ ans))))
+			'(classic:square-r classic:square-i classic:square-lp
+			classic:square-f classic:square-u))
+		(mapcar (lambda (f)
+			(5am:is (util:in-epsilon ans
+				(lazy:head (lazy-seqs:drop (floor n) (funcall f)))
+				(* +epsilon+ ans))))
+			'(classic:squares-strm classic:squares-map2
+			classic:squares-su))
+		)) '(2.0 11.0 20.0)))
 
 (5am:test (test-expt :fixture fixc-classic)
 	(mapcar (lambda (tup)
 		(let* ((b (car tup)) (n (cdr tup)) (ans (expt b n)))
 		(mapcar (lambda (f)
-			(5am:is (util:in-epsilon (* +epsilon+ ans) ans (funcall f b n))))
+			(5am:is (util:in-epsilon ans (funcall f b n) (* +epsilon+ ans))))
 			'(classic:expt-r classic:expt-i classic:expt-lp
-				classic:fast-expt-r classic:fast-expt-i classic:fast-expt-lp))))
-		(util:cartesian-prod '(2.0 11.0 20.0) '(3.0 6.0 10.0))))
+				classic:fast-expt-r classic:fast-expt-i classic:fast-expt-lp 
+				classic:expt-f classic:expt-u))
+		(mapcar (lambda (f)
+			(5am:is (util:in-epsilon ans
+				(lazy:head (lazy-seqs:drop (floor n) (funcall f b)))
+				(* +epsilon+ ans))))
+			'(classic:expts-strm classic:expts-map2 classic:expts-su))
+		)) (util:cartesian-prod '(2.0 11.0 20.0) '(3.0 6.0 10.0))))
 
 (5am:test (test-sum-to :fixture fixc-classic)
 	(mapcar (lambda (tup)
 		(let* ((hi (car tup)) (lo (cdr tup))
-			(ans (reduce #'+ (util:range-cnt (1+ lo) (- hi lo)) :initial-value lo)))
+			(ans (reduce #'+ (util:range-cnt (1+ lo) (- hi lo)) 
+			:initial-value lo)))
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f hi lo))))
-			'(classic:sum-to-r classic:sum-to-i classic:sum-to-lp))))
-		(util:cartesian-prod '(15 0 150) '(-20 0 -10))))
+			'(classic:sum-to-r classic:sum-to-i classic:sum-to-lp 
+			classic:sum-to-f classic:sum-to-u))
+		(mapcar (lambda (f)
+			(5am:is (= (reduce #'+ (util:range-cnt (1+ lo) (- hi lo)) 
+				:initial-value lo) (lazy:head (lazy-seqs:drop (floor (- hi lo))
+				(funcall f lo))))))
+			'(classic:sums-strm classic:sums-map2 classic:sums-su))
+		)) (util:cartesian-prod '(15 0 150) '(-20 0 -10))))
 
 (5am:test (test-fact :fixture fixc-classic)
 	(mapcar (lambda (n)
 		(let ((ans (reduce #'* (util:range-cnt 1 n) :initial-value 1)))
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f n))))
-			'(classic:fact-r classic:fact-i classic:fact-lp))))
-		'(0 9 18)))
+			'(classic:fact-r classic:fact-i classic:fact-lp 
+			classic:fact-f classic:fact-u))
+		(mapcar (lambda (f)
+			(5am:is (= ans (lazy:head (lazy-seqs:drop n (funcall f))))))
+			'(classic:facts-strm classic:facts-map2 classic:facts-su))
+		)) '(0 9 18)))
 
 (5am:test (test-fib :fixture fixc-classic)
 	(mapcar (lambda (n)
@@ -56,8 +80,12 @@
 				:initial-value '(0 . 1)))))
 		(mapcar (lambda (f)
 			(5am:is (= ans (funcall f n))))
-			'(classic:fib-r classic:fib-i classic:fib-lp))))
-		'(0 10 20)))
+			'(classic:fib-r classic:fib-i classic:fib-lp classic:fib-f
+			classic:fib-u))
+		(mapcar (lambda (f)
+			(5am:is (= ans (lazy:head (lazy-seqs:drop n (funcall f))))))
+			'(classic:fibs-strm classic:fibs-map2 classic:fibs-su))
+		)) '(0 10 20)))
 
 (5am:test (test-pascaltri :fixture fixc-classic)
 	(mapcar (lambda (rows)
@@ -67,8 +95,13 @@
 				:initial-value '((1))))))
 		(mapcar (lambda (f)
 			(5am:is (equalp ans (funcall f rows))))
-			'(classic:pascaltri-mult classic:pascaltri-add))))
-		'(0 5 10)))
+			'(classic:pascaltri-mult classic:pascaltri-add 
+			classic:pascaltri-f classic:pascaltri-u))
+		(mapcar (lambda (f)
+			(5am:is (equalp ans (lazy-seqs:take (1+ rows) (funcall f)))))
+			'(classic:pascalrows-strm classic:pascalrows-map2
+			classic:pascalrows-su))
+		)) '(0 5 10)))
 
 (5am:test (test-quot-rem :fixture fixc-classic)
 	(mapcar (lambda (tup)
@@ -96,7 +129,9 @@
 				(5am:is (= ans-l (apply fn-lcm nums)))))
 				'((classic:gcd-r . classic:lcm-r)
 				(classic:gcd-i . classic:lcm-i)
-				(classic:gcd-lp . classic:lcm-lp)))))
+				(classic:gcd-lp . classic:lcm-lp)
+				(classic:gcd-f . classic:lcm-f)
+				(classic:gcd-u . classic:lcm-u)))))
 		'((24) (24 16) (24 16 12) (24 16 32))))
 
 (5am:test (test-base-expand :fixture fixc-classic)
@@ -107,7 +142,9 @@
 			(ans (reduce corp (util:range-cnt 0 (round (log num base))) :initial-value (list (float num)))))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f base num))))
-			'(classic:base-expand-r classic:base-expand-i classic:base-expand-lp))))
+			'(classic:base-expand-r classic:base-expand-i 
+			classic:base-expand-lp classic:base-expand-f
+			classic:base-expand-u))))
 		'((2 . 11) (4 . 81) (3 . 243) (2 . 16))))
 
 (5am:test (test-base-to10 :fixture fixc-classic)
@@ -117,7 +154,8 @@
 			(ans (reduce corp (mapcar #'list (util:range-cnt 0 (length nums)) (reverse nums)) :initial-value 0)))
 		(mapcar (lambda (f)
 			(5am:is (equal ans (funcall f base nums))))
-			'(classic:base-to10-r classic:base-to10-i classic:base-to10-lp))))
+			'(classic:base-to10-r classic:base-to10-i classic:base-to10-lp
+			classic:base-to10-f classic:base-to10-u))))
 		'((2 (1 0 1 1)) (4 (1 1 0 1)) (3 (1 0 0 0 0 0)) (2 (1 0 0 0 0)))))
 
 (5am:test (test-range :fixture fixc-classic)
@@ -134,16 +172,19 @@
 			))
 			'((classic:range-r . classic:range-step-r)
 				(classic:range-i . classic:range-step-i)
-				(classic:range-lp . classic:range-step-lp)))))
+				(classic:range-lp . classic:range-step-lp)
+				(classic:range-f . classic:range-step-f)
+				(classic:range-u . classic:range-step-u)))))
 		'((2 . -1) (11 . -5) (20 . -1))))
 
 (5am:test (test-compose :fixture fixc-classic)
 	(let ((fn-iota (lambda (ct) (util:range-cnt 0 ct)))
 		(fn-square (lambda (n) (expt n 2.0))))
 	(mapcar (lambda (f)
-		(5am:is (util:in-epsilon (* +epsilon+ 2) 2 
-			(funcall (funcall f fn-square #'sqrt) 2)))
+		(5am:is (util:in-epsilon 2 
+			(funcall (funcall f fn-square #'sqrt) 2) (* +epsilon+ 2)))
 		(5am:is (equal 5 (funcall (funcall f #'length fn-iota) 5)))
 		(5am:is (equal '(0 1 2 3 4) (funcall (funcall f fn-iota) 5))))
-		'(classic:compose-r classic:compose-i classic:compose-lp))))
+		'(classic:compose-r classic:compose-i classic:compose-lp
+		classic:compose-f classic:compose-u))))
 
