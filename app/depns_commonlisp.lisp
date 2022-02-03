@@ -4,8 +4,8 @@
 
 #|
 	--- one-time QuickLisp install/setup
-	curl -O https://beta.quicklisp.org/quicklisp.lisp[.asc]
-	gpg --verify quicklisp.lisp.asc quicklisp.lisp
+	curl -LO https://beta.quicklisp.org/{quicklisp.lisp[.asc],release-key.txt}
+	gpg --import release-key.txt ; gpg --verify quicklisp.lisp.asc quicklisp.lisp
 	[sbcl | ccl] --load quicklisp.lisp
 	  * (quicklisp-quickstart:install)
 	  * (ql:add-to-init-file)
@@ -25,8 +25,7 @@
 (defun main (argv)
     (progn
 		(mapcar (lambda (pkg) (ql:quickload pkg))
-			(list "fiveam" "lisp-unit2" "clunit" "cl-quickcheck" "cl-project" "documentation-template" "codex" "buildapp" "cl-ppcre" "py-configparser" "cl-json" "cl-yaml" "log4cl" "unix-options" "getopt" "cli-parser" "cffi"
-			"queues.simple-queue" "queues.priority-queue"))
+			(list "fiveam" "lisp-unit2" "clunit" "cl-quickcheck" "cl-project" "documentation-template" "codex" "buildapp" "cl-ppcre" "py-configparser" "cl-json" "cl-yaml" "log4cl" "unix-options" "getopt" "cli-parser" "cffi" "clazy" "queues.simple-queue" "queues.priority-queue"))
 		nil)
 
     ) ;(uiop:quit))

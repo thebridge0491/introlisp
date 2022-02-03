@@ -19,17 +19,29 @@ version control repository clone:
         
         git clone https://bitbucket.org/thebridge0491/introlisp.git
 
-note quicklisp required for install
+note quicklisp required for install to $HOME/quicklisp/local-projects
 
-cd <path> ; ln -sf $PWD introlisp.intro ; mv introlisp.intro ~/quicklisp/local-projects/
+build example with rake:
 
-sbcl --eval "(progn (ql:register-local-projects) (uiop:quit))"
+        [sudo] rake install
 
-sbcl --load tests/test-suite.lisp --eval "(introlisp.intro/test:main '())"
+        [COMPILER=sbcl] rake all [test]
+
+build example with ninja:
+
+        [sudo] ninja install
+
+        [COMPILER=sbcl] ninja [test]
+
+build example with make:
+
+        [sudo] make install
+
+        [COMPILER=sbcl] make all [test]
 
 Usage
 -----
-	rlwrap sbcl
+	rlwrap [sbcl | ccl]
 	
 	 > (asdf:load-systems :introlisp.intro)
 	 

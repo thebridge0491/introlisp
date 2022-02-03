@@ -1,7 +1,7 @@
 @begin(section)
 @title(Overview)
 
-Utilites sub-package for Common Lisp Intro examples project.
+Utilities sub-package for Common Lisp Intro examples project.
 
 @cl:with-package[name="introlisp.util"](
 @cl:doc(function cartesian-prod)

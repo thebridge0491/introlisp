@@ -5,7 +5,7 @@
 ; explanation ;    Regarding line on which it appears
 
 (defpackage :introlisp.util
-  (:documentation "Utilites sub-package for Common Lisp Intro examples project.")
+  (:documentation "Utilities sub-package for Common Lisp Intro examples project.")
   (:use :cl)
   (:export :in-epsilon :cartesian-prod)
   )

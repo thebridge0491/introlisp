@@ -4,12 +4,12 @@
   This file is a part of introlisp.util project.
 |#
 #|
-  Utilites sub-package for Common Lisp Intro examples project.
+  Utilities sub-package for Common Lisp Intro examples project.
 |#
 #-asdf3.1 (error "Introlisp.Util requires ASDF >= 3.1.2, please upgrade asdf")
 
 (defsystem :introlisp.util
-  :description "Utilites sub-package for Common Lisp Intro examples project."
+  :description "Utilities sub-package for Common Lisp Intro examples project."
   :long-description
   #.(read-file-string (subpathname *load-pathname* "README.rst"))
   :author "thebridge0491"

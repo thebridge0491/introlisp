@@ -1,6 +1,6 @@
 .POSIX:
 .SUFFIXES:
-PREFIX = /usr/local
+PREFIX ?= /usr/local
 
 DEBUG = 0
 
@@ -16,15 +16,14 @@ COMPILER = sbcl
 pkg = intro
 parent = introlisp
 proj = introlisp.intro
-#namespace_path = $(shell echo $(parent) | sed 'y|.|/|')
+namespace_path = $(shell echo $(parent) | sed 'y|.|/|')
 version = 0.1.0
-#ver_major = $(shell echo $(version) | cut -d'.' -f1)
 
 build/.depend:
 	-mkdir -p ~/quicklisp/local-projects/$(parent)
 	-find src tests -type d -exec mkdir -p build/{} \;
 	-cp -fR resources build
-	-touch $@
+	-@echo '' > build/.depend
 
 build/ts_main: tests/test-suite.lisp
 	-rm $@
@@ -34,7 +33,7 @@ build/ts_main: tests/test-suite.lisp
 
 .PHONY: all compile run repl_run testCompile
 
-all compile : build/.depend  build/main ## compile
+all compile : build/.depend build/main ## compile
 testCompile : build/ts_main ## compile test
 
 build/main: src/main.lisp

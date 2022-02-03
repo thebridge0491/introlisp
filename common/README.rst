@@ -3,7 +3,7 @@ Introlisp.Util
 .. .rst to .html: rst2html5 foo.rst > foo.html
 ..                pandoc -s -f rst -t html5 -o foo.html foo.rst
 
-Utilites sub-package for Common Lisp Intro examples project.
+Utilities sub-package for Common Lisp Intro examples project.
 
 Installation
 ------------
@@ -19,17 +19,29 @@ version control repository clone:
         
         git clone https://bitbucket.org/thebridge0491/introlisp.git
 
-note quicklisp required for install
+note quicklisp required for install to $HOME/quicklisp/local-projects
 
-cd <path> ; ln -sf $PWD introlisp.util ; mv introlisp.util ~/quicklisp/local-projects/
+build example with rake:
 
-sbcl --eval "(progn (ql:register-local-projects) (uiop:quit))"
+        [sudo] rake install
 
-sbcl --load tests/test-suite.lisp --eval "(introlisp.util/test:main '())"
+        [COMPILER=sbcl] rake all [test]
+
+build example with ninja:
+
+        [sudo] ninja install
+
+        [COMPILER=sbcl] ninja [test]
+
+build example with make:
+
+        [sudo] make install
+
+        [COMPILER=sbcl] make all [test]
 
 Usage
 -----
-	rlwrap sbcl
+	rlwrap [sbcl | ccl]
 	
 	 > (asdf:load-systems :introlisp.util)
 	 

@@ -5,7 +5,7 @@
 ; explanation ;    Regarding line on which it appears
 
 (defpackage :introlisp.util/src/lib
-  (:documentation "Utilites sub-package for Common Lisp Intro examples project.")
+  (:documentation "Utilities sub-package for Common Lisp Intro examples project.")
   (:use :cl)
   (:nicknames :introlisp.util)
   (:export :date-to-string :display-nested :mkstring-nested :echo-invoke

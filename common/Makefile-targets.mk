@@ -4,8 +4,13 @@
 # $* - basename (cur target)  $^ - name(s) (all depns)  $< - name (1st depn)
 # $@ - name (cur target)      $% - archive member name  $? - changed depns
 
-FMTS ?= tar.gz
+FMTS ?= tar.gz,zip
 distdir = $(proj)-$(version)
+
+build/$(distdir) : 
+	-@mkdir -p build/$(distdir) ; cp -f exclude.lst build/
+#	#-zip -9 -q --exclude @exclude.lst -r - . | unzip -od build/$(distdir) -
+	-tar --format=posix --dereference --exclude-from=exclude.lst -cf - . | tar -xpf - -C build/$(distdir)
 
 .PHONY: help clean test repl_test uninstall install dist doc
 help: ## help
@@ -34,18 +39,17 @@ uninstall install: ## [un]install artifacts
 		ln -sf $(PWD) $(proj) ; \
 		mv $(proj) ~/quicklisp/local-projects/$(parent)/ ; \
 	fi
-	-rlwrap $(COMPILER) --eval '(progn (ql:register-local-projects) (uiop:quit))'
-dist: ## [FMTS="tar.gz"] archive source code
-	-@mkdir -p build/$(distdir) ; cp -f exclude.lst build/
-#	#-zip -9 -q --exclude @exclude.lst -r - . | unzip -od build/$(distdir) -
-	-tar --format=posix --dereference --exclude-from=exclude.lst -cf - . | tar -xpf - -C build/$(distdir)
-	
+	-rlwrap $(COMPILER) --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "$(proj)") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+dist: | build/$(distdir) ## [FMTS="tar.gz,zip"] archive source code
 	-@for fmt in `echo $(FMTS) | tr ',' ' '` ; do \
 		case $$fmt in \
+			7z) echo "### build/$(distdir).7z ###" ; \
+				rm -f build/$(distdir).7z ; \
+				(cd build ; 7za a -t7z -mx=9 $(distdir).7z $(distdir)) ;; \
 			zip) echo "### build/$(distdir).zip ###" ; \
 				rm -f build/$(distdir).zip ; \
 				(cd build ; zip -9 -q -r $(distdir).zip $(distdir)) ;; \
-			*) tarext=`echo $$fmt | grep -e '^tar$$' -e '^tar.xz$$' -e '^tar.bz2$$' || echo tar.gz` ; \
+			*) tarext=`echo $$fmt | grep -e '^tar$$' -e '^tar.xz$$' -e '^tar.zst$$' -e '^tar.bz2$$' || echo tar.gz` ; \
 				echo "### build/$(distdir).$$tarext ###" ; \
 				rm -f build/$(distdir).$$tarext ; \
 				(cd build ; tar --posix -L -caf $(distdir).$$tarext $(distdir)) ;; \
