@@ -1,0 +1,12 @@
+# FFI auxiliary ninja script.
+
+ffi_libdir = $$(${PKG_CONFIG} --variable=libdir intro_c-practice || echo .)
+ffi_incdir = $$(${PKG_CONFIG} --variable=includedir intro_c-practice || echo .)
+LD_LIBRARY_PATH = $${LD_LIBRARY_PATH}:${ffi_libdir}
+
+build prep_swig: custom_cmd || src/classic-c.i
+  DESC = Compile Swig files
+  COMMAND = $
+    swig -cffi -noswig-lisp -I${ffi_incdir} -outdir build src/classic-c.i
+  pool = console
+  restat = 1

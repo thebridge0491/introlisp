@@ -1,0 +1,72 @@
+PREFIX = $${PREFIX:-/usr/local}
+
+DEBUG = $${DEBUG:-0}
+
+# Single package build.ninja script.
+ninja_required_version = 1.5
+
+#rootdir = .
+builddir = build
+
+PKG_CONFIG = pkg-config --with-path=${PREFIX}/lib/pkgconfig
+
+# COMPILER=[sbcl | ccl]
+COMPILER = $${COMPILER:-sbcl}
+
+pkg = {{project}}{{^project}}util{{/project}}
+parent = {{parent}}{{^parent}}introlisp{{/parent}}
+proj = ${parent}.${pkg}
+namespace_path = $$(echo ${parent} | sed 'y|.|/|')
+version = {{version}}{{^version}}0.1.0{{/version}}
+
+# Rule for running custom commands.
+rule custom_cmd
+  description = $DESC
+  command = $COMMAND
+
+include ./build-targets.ninja
+#include ./build-auxffi.ninja
+
+build build/.depend: custom_cmd
+  DESC = Set up buildir & generate .depend file
+  COMMAND = $
+    mkdir -p $${HOME}/quicklisp/local-projects/${parent} ; $
+    $$(find src tests -type d -exec mkdir -p build/{} \;) ; $
+    cp -fR resources build ; $
+    echo '' > build/.depend
+
+build build/ts_main: custom_cmd || tests/test-suite.lisp
+  DESC = Compile test
+# #rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(${proj}/test:save-image)'
+# #$${HOME}/bin/buildapp_${COMPILER} --load tests/test-suite.lisp --entry ${proj}/test:main --output build/ts_main
+  COMMAND = $
+    rm build/ts_main ; $
+    rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(asdf:make :${proj}/test-image)'
+{{#executable}}
+
+build build/main: custom_cmd || src/main.lisp
+  DESC = Compile main
+# #rlwrap ${COMPILER} --load src/main.lisp --eval '(${proj}:save-image)'
+# #$${HOME}/bin/buildapp_${COMPILER} --load src/main.lisp --entry ${proj}:main --output build/main
+  COMMAND = $
+    rm build/main ; $
+    rlwrap ${COMPILER} --load src/main.lisp --eval '(asdf:make :$(proj)/run-image)'
+
+build run: custom_cmd || build/main
+  DESC = Run main app [ARGS=$${ARGS:-}]
+  COMMAND = build/main $${ARGS:-}
+  pool = console
+  restat = 1
+
+build repl_run: custom_cmd || src/main.lisp
+  DESC = In repl, run main app [ARGS=$${ARGS:-}]
+# #rlwrap ${COMPILER} --load src/main.lisp --eval '(progn (asdf:load-system :${proj}) (${proj}:run-main))' $${ARGS:-}
+  COMMAND = rlwrap ${COMPILER} --load src/main.lisp --eval '(asdf:test-system :${proj}/run)' $${ARGS:-}
+  pool = console
+  restat = 1
+{{/executable}}
+
+build all: phony build/.depend{{#executable}} build/main{{/executable}}
+build testcompile: phony build/ts_main
+
+default help

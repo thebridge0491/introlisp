@@ -1,19 +1,19 @@
 {
+  "parentregex": "^[a-z][.a-z0-9]+$",
+  "projectregex": "^[a-z][a-z0-9]+$",
+  "separator": ".",
+  "joiner": ".",
   "groupid": false,
   "category": false,
   "parent": "introlisp",
   "parentdescription": "Multi-package project Intro examples for Common Lisp.",
   "project": "util",
-  "description": "Utilites sub-package for Common Lisp Intro examples project.",
+  "description": "Utilities sub-package for Common Lisp Intro examples project.",
   "version": "0.1.0",
-  "separator": ".",
-  "joiner": ".",
-  "parentregex": "^[a-z][.a-z0-9]+$",
-  "projectregex": "^[a-z][a-z0-9]+$",
   
   "repohost": "bitbucket.org",
   "repoacct": "imcomputer",
-  "date": "2014-02-11",
+  "date": "2013-10-01",
   
   "readmeext": ".rst",
   "license": "Apache-2.0",
@@ -25,12 +25,12 @@
   "skeletondir": "Templates/mustache/skeleton-lisp",
   
   "_choices": {
-    "readmeext": [".rst", ".md", ".adoc", ".org"],
+    "readmeext": [".rst", ".md", ".adoc"],
     "license": ["Apache-2.0", "MIT", "BSD-3-Clause", "GPL-3.0+", "ISC", 
       "Unlicense", "Not open source"],
-    "buildtool": ["make", "rake"],
+    "buildtool": ["make", "ninja", "rake"],
     "testfrwk": ["fiveam", "lisp-unit2", "clunit"],
-    "executable": [false, "yes"],
+    "executable": ["no", "yes"],
     "ffilib": ["none", "cffi", "swig"]
   }
 }

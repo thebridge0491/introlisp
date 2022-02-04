@@ -2,7 +2,7 @@ PREFIX = ENV['prefix'] ? ENV['prefix'] : '/usr/local'
 DEBUG = ENV['DEBUG'] ? ENV['DEBUG'] : '0'
 
 RAKE = ENV['RAKE'] ? ENV['RAKE'] : 'rake'
-# Single package rakefile script.
+# Single package Rakefile script.
 
 PKG_CONFIG = "pkg-config --with-path=#{PREFIX}/lib/pkgconfig"
 
@@ -21,7 +21,7 @@ end
 VARS = SharedVars.new
 VARS.parent, pkg = '{{parent}}{{^parent}}introlisp{{/parent}}', '{{project}}{{^project}}util{{/project}}'
 VARS.proj, VARS.version = '{{name}}{{^name}}introlisp.util{{/name}}', '{{version}}{{^version}}0.1.0{{/version}}'
-#namespace_path = VARS.parent.gsub(/\./, '/')
+namespace_path = VARS.parent.gsub(/\./, '/')
 
 desc "Default target: #{RAKE} help"
 task :default => [:help]

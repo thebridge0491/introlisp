@@ -13,13 +13,13 @@ SUBDIRS = common app
 
 .PHONY: all help clean test repl_test uninstall install
 help: $(SUBDIRS)
-	-for dirX in $^ ; do $(MAKE) -C $$dirX $@ ; done
+	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 	@echo "##### Top-level multiproject: $(parent) #####"
 	@echo "Usage: $(MAKE) [SUBDIRS="$(SUBDIRS)"] [COMPILER="$(COMPILER)"] [target]"
 all test repl_test uninstall install: $(SUBDIRS)
-	-for dirX in $^ ; do $(MAKE) -C $$dirX $@ ; done
+	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 clean: $(SUBDIRS)
-	-for dirX in $^ ; do $(MAKE) -C $$dirX $@ ; done
+	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 	-rm -fr core* *~ .*~ build/* *.log */*.log
 
 #----------------------------------------
@@ -31,8 +31,8 @@ build/$(distdir) :
 #	#-zip -9 -q --exclude @exclude.lst -r - . | unzip -od build/$(distdir) -
 	-tar --format=posix --dereference --exclude-from=exclude.lst -cf - . | tar -xpf - -C build/$(distdir)
 
-.PHONY: dist doc run repl_run
-dist | build/$(distdir): $(SUBDIRS)
+.PHONY: package doc run repl_run
+package: $(SUBDIRS) | build/$(distdir)
 	-@for fmt in `echo $(FMTS) | tr ',' ' '` ; do \
 		case $$fmt in \
 			7z) echo "### build/$(distdir).7z ###" ; \
@@ -48,8 +48,8 @@ dist | build/$(distdir): $(SUBDIRS)
 		esac \
 	done
 	-@rm -r build/$(distdir)
-	-for dirX in $^ ; do $(MAKE) -C $$dirX $@ ; done
+	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 doc: $(SUBDIRS)
-	-for dirX in $^ ; do $(MAKE) -C $$dirX $@ ; done
+	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 run repl_run: app
-	-$(MAKE) -C app $@
+	-ninja -C app $@

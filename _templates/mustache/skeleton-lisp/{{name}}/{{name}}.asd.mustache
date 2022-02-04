@@ -8,7 +8,7 @@
 |#
 #|
 {{#description}}
-  {{description}}{{^description}}Utilites sub-package for Common Lisp Intro examples project.{{/description}}
+  {{description}}{{^description}}Utilities sub-package for Common Lisp Intro examples project.{{/description}}
 {{/description}}
 {{#author}}
   Author: {{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}} <{{email}}{{^email}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}-codelab@yahoo.com{{/email}}>
@@ -17,7 +17,7 @@
 #-asdf3.1 (error "{{parentcap}}{{^parentcap}}Introlisp{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}} requires ASDF >= 3.1.2, please upgrade asdf")
 
 (defsystem :{{name}}{{^name}}introlisp.util{{/name}}
-  :description "{{description}}{{^description}}Utilites sub-package for Common Lisp Intro examples project.{{/description}}"
+  :description "{{description}}{{^description}}Utilities sub-package for Common Lisp Intro examples project.{{/description}}"
   :long-description
   #.(read-file-string (subpathname *load-pathname* "README{{readmeext}}{{^readmeext}}.rst{{/readmeext}}"))
   :author "{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}"

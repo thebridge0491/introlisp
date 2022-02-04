@@ -1,0 +1,75 @@
+# Targets ninja script.
+
+build help: custom_cmd
+  DESC = Targets available -- ninja -t targets [OPTS=$${OPTS:-}]
+  COMMAND = ninja -t targets $${OPTS:-}
+
+build clean: custom_cmd
+  DESC = Clean build artifacts -- ninja -t clean [OPTS=$${OPTS:-}]
+  COMMAND = ninja -t clean $${OPTS:-}
+
+build test: custom_cmd || build/ts_main
+  DESC = Run test [TOPTS=$${TOPTS:-}]
+  COMMAND = build/ts_main $${TOPTS:-}
+  pool = console
+  restat = 1
+
+build repl_test: custom_cmd || tests/test-suite.lisp
+  DESC = In repl, run test [TOPTS=$${TOPTS:-}]
+  COMMAND = rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(asdf:test-system :${proj}/test)' $${TOPTS:-}
+  pool = console
+  restat = 1
+
+build uninstall: custom_cmd
+  DESC = Uninstall artifacts
+  COMMAND = $
+    rm -rf ~/quicklisp/local-projects/${parent}/${proj} || true ; $
+    rlwrap ${COMPILER} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+  pool = console
+  restat = 1
+
+build install: custom_cmd
+  DESC = Install artifacts
+  COMMAND = $
+    ln -sf $${PWD} ${proj} ; $
+    mv ${proj} ~/quicklisp/local-projects/${parent}/ ; $
+    rlwrap ${COMPILER} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+  pool = console
+  restat = 1
+
+distdir = ${proj}-${version}
+
+build build/${distdir}: custom_cmd
+  DESC = Set up archive files
+  COMMAND = $
+    mkdir -p build/${distdir} ; cp -f ./exclude.lst build/ ; $
+    tar --format=posix --dereference --exclude-from=exclude.lst -cf - . | tar -xpf - -C build/${distdir}
+
+build package: custom_cmd || build/${distdir}
+  DESC = Archive source code [FMTS=$${FMTS:-tar.gz,zip}]
+  COMMAND = $
+    for fmt in $$(echo $${FMTS:-tar.gz,zip} | tr ',' ' ') ; do $
+      case $$fmt in $
+        7z) echo "### build/${distdir}.7z ###" ; $
+          rm -f build/${distdir}.7z ; $
+          $$(cd build ; 7za a -t7z -mx=9 ${distdir}.7z ${distdir}) ;; $
+        zip) echo "### build/${distdir}.zip ###" ; $
+          rm -f build/${distdir}.zip ; $
+          $$(cd build ; zip -9 -q -r ${distdir}.zip ${distdir}) ;; $
+        *) tarext=$$(echo $$fmt | grep -e '^tar$$' -e '^tar.xz$$' -e '^tar.zst$$' -e '^tar.bz2$$' || echo tar.gz) ; $
+          echo "### build/${distdir}.$$tarext ###" ; $
+          rm -f build/${distdir}.$$tarext ; $
+          $$(cd build ; tar --posix -L -caf ${distdir}.$$tarext ${distdir}) ;; $
+      esac ; $
+    done ; $
+    rm -r build/${distdir}
+  pool = console
+  restat = 1
+
+build doc: custom_cmd
+  DESC = Generate documentation
+  COMMAND = $
+    rm -fr build/html ; mkdir -p build/html ; $
+    rlwrap ${COMPILER} --load doc_gen.lisp --eval '(uiop:quit)'
+  pool = console
+  restat = 1
