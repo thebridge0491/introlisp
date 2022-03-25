@@ -10,8 +10,8 @@ help:
 
 PKG_CONFIG = pkg-config --with-path=$(PREFIX)/lib/pkgconfig
 
-# COMPILER=[sbcl | ccl]
-COMPILER = sbcl
+# LISP=[sbcl | clisp]
+LISP = sbcl
 
 pkg = practice
 parent = introlisp
@@ -27,9 +27,14 @@ build/.depend:
 
 build/ts_main: tests/test-suite.lisp
 	-rm $@
-#	-rlwrap $(COMPILER) --load tests/test-suite.lisp --eval '($(proj)/test:save-image)'
-#	-~/bin/buildapp_$(COMPILER) --load tests/test-suite.lisp --entry $(proj)/test:main --output $@
-	-rlwrap $(COMPILER) --load tests/test-suite.lisp --eval '(asdf:make :$(proj)/test-image)'
+#	-~/bin/buildapp_$(LISP) --load tests/test-suite.lisp --entry $(proj)/test:main --output $@
+	-if [ "clisp" = $(LISP) ] ; then \
+#		rlwrap $(LISP) -i tests/test-suite.lisp -x '($(proj)/test:save-image)' ; \
+		rlwrap $(LISP) -i tests/test-suite.lisp -x '(asdf:make :$(proj)/test-image)' ; \
+	else \
+#		rlwrap $(LISP) --load tests/test-suite.lisp --eval '($(proj)/test:save-image)' ; \
+		rlwrap $(LISP) --load tests/test-suite.lisp --eval '(asdf:make :$(proj)/test-image)' ; \
+	fi
 
 .PHONY: all compile testCompile
 

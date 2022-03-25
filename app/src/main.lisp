@@ -22,16 +22,16 @@
         :target "docpath/dir/file.html")
     
     --- [native|byte]code - compile ; then run app ---
-    ;[sbcl | ccl] --load main.lisp --eval '(pkg:save-image)'
+    ;[sbcl | clisp] [--load | -i] main.lisp [--eval | -x] '(pkg:save-image)'
     ;buildapp --load main.lisp --entry pkg:main --output main
-    [sbcl | ccl] --load main.lisp --eval '(asdf:make :pkg/run-image)'
+    [sbcl | clisp] [--load | -i] main.lisp [--eval | -x] '(asdf:make :pkg/run-image)'
     ./main arg1 argN
     
     --- start REPL w/ loaded script ; then run app ---
-    ; [sbcl | ccl] --load main.lisp --eval '(pkg:run-main)' -- arg1 argN
-    ;[sbcl | ccl] --load main.lisp
+    ; [sbcl | clisp] [--load | -i] main.lisp [--eval | -x] '(pkg:run-main)' -- arg1 argN
+    ;[sbcl | clisp] [--load | -i] main.lisp
     ;  --eval '(asdf:test-system :pkg/run)' -- arg1 argN
-    [sbcl | ccl] --load main.lisp --eval '(main (list arg1 argN))'
+    [sbcl | clisp] [--load | -i] main.lisp [--eval | -x] '(main (list arg1 argN))'
     * > (main '("arg1" "argN"))
     
     --- help/info tools in REPL ---
@@ -186,6 +186,7 @@
 		(format t "~a~%"
 			#+ccl (ccl::class-slots (find-class 'person:<person>))
 			#+sbcl (sb-mop:class-slots (find-class 'person:<person>))
+			#+clisp (clos:class-slots (find-class 'person:<person>))
 			)
 		;(format t "person-age person1: ~a~%" (slot-value person1 'person:age))
 		;(setf (slot-value person1 'person:age) 33)
@@ -355,6 +356,8 @@
 (defun save-image ()
 	#+sbcl (sb-ext:save-lisp-and-die "build/main" :executable t
 		:toplevel 'introlisp.intro:run-main)
+	#+clisp (ext:saveinitmem "build/main" :executable t
+		:init-function 'introlisp.intro:run-main)
 	#+ccl (ccl:save-application "build/main" :prepend-kernel t
 		:toplevel-function 'introlisp.intro:run-main)
 	)

@@ -25,23 +25,23 @@ build example with rake:
 
         [sudo] rake install
 
-        [COMPILER=sbcl] rake all [test]
+        [LISP=sbcl] rake all [test]
 
 build example with ninja:
 
         [sudo] ninja install
 
-        [COMPILER=sbcl] ninja [test]
+        [LISP=sbcl] ninja [test]
 
 build example with make:
 
         [sudo] make install
 
-        [COMPILER=sbcl] make all [test]
+        [LISP=sbcl] make all [test]
 
 Usage
 -----
-	rlwrap [sbcl | ccl]
+	rlwrap [sbcl | clisp]
 	
 	 > (asdf:load-systems :introlisp.intro)
 	 

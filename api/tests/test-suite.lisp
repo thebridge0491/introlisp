@@ -22,17 +22,17 @@
         :target "docpath/dir/file.html")
     
     --- [native|byte]code - compile ; then run tests ---
-    ;[sbcl | ccl] --load test-suite.lisp --eval '(pkg/test:save-image)'
+    ;[sbcl | clisp] [--load | -i] test-suite.lisp [--eval | -x] '(pkg/test:save-image)'
     ;buildapp --load test-suite.lisp --entry pkg/test:main --output ts_main
-    [sbcl | ccl] --load test-suite.lisp --eval '(asdf:make :pkg/test-image)'
+    [sbcl | clisp] [--load | -i] test-suite.lisp [--eval | -x] '(asdf:make :pkg/test-image)'
     ./ts_main topt1 toptN
     
     --- start REPL w/ loaded script ; then run tests ---
-    ; [sbcl | ccl] --load test-suite.lisp
+    ; [sbcl | clisp] [--load | -i] test-suite.lisp
     ;   --eval '(pkg/test:run-suites)' -- topt1 toptN
-    ;[sbcl | ccl] --load test-suite.lisp
+    ;[sbcl | clisp] [--load | -i] test-suite.lisp
     ;  --eval '(asdf:test-system :pkg/test)' -- topt1 toptN
-    [sbcl | ccl] --load test-suite.lisp --eval '(pkg/test:main (list topt1 toptN))'
+    [sbcl | clisp] [--load | -i] test-suite.lisp [--eval | -x] '(pkg/test:main (list topt1 toptN))'
     * > (main '("topt1" "toptN"))
     
     --- help/info tools in REPL ---
@@ -109,6 +109,8 @@
 (defun save-image ()
 	#+sbcl (sb-ext:save-lisp-and-die "build/ts_main" :executable t
 		:toplevel 'introlisp.practice/test:run-suites)
+	#+clisp (ext:saveinitmem "build/ts_main" :executable t
+		:init-function 'introlisp.practice/test:run-suites)
 	#+ccl (ccl:save-application "build/ts_main" :prepend-kernel t
 		:toplevel-function 'introlisp.practice/test:run-suites)
 	)
