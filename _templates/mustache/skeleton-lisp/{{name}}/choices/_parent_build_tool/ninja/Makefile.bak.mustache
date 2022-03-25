@@ -4,8 +4,8 @@ help:
 
 #MAKE = make # (GNU make variants: make (Linux) gmake (FreeBSD)
 
-# COMPILER=[sbcl | ccl]
-COMPILER = sbcl
+# LISP=[sbcl | clisp]
+LISP = sbcl
 
 parent = {{parent}}{{^parent}}introlisp{{/parent}}
 version = {{version}}{{^version}}0.1.0{{/version}}
@@ -15,7 +15,7 @@ SUBDIRS = common app
 help: $(SUBDIRS)
 	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 	@echo "##### Top-level multiproject: $(parent) #####"
-	@echo "Usage: $(MAKE) [SUBDIRS="$(SUBDIRS)"] [COMPILER="$(COMPILER)"] [target]"
+	@echo "Usage: $(MAKE) [SUBDIRS="$(SUBDIRS)"] [LISP="$(LISP)"] [target]"
 all test repl_test uninstall install: $(SUBDIRS)
 	-for dirX in $^ ; do ninja -C $$dirX $@ ; done
 clean: $(SUBDIRS)

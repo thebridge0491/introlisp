@@ -15,7 +15,7 @@ build/$(distdir) :
 .PHONY: help clean test repl_test uninstall install dist doc
 help: ## help
 	@echo "##### subproject: $(proj) #####"
-	@echo "Usage: $(MAKE) [COMPILER="$(COMPILER)"] [target] -- some valid targets:"
+	@echo "Usage: $(MAKE) [LISP="$(LISP)"] [target] -- some valid targets:"
 #	-@for fileX in $(MAKEFILE_LIST) `if [ -z "$(MAKEFILE_LIST)" ] ; then echo Makefile Makefile-targets.mk ; fi` ; do \
 #		grep -ve '^[A-Z]' $$fileX | awk '/^[^.%][-A-Za-z0-9_]+[ ]*:.*$$/ { print "...", substr($$1, 1, length($$1)) }' | sort ; \
 #	done
@@ -30,8 +30,13 @@ test: testCompile ## run test [TOPTS=""]
 #	setenv [DY]LD_LIBRARY_PATH . # (tcsh FreeBSD)
 	-build/ts_main $(TOPTS)
 repl_test : tests/test-suite.lisp ## in repl, run test [TOPTS=""]
-#	-rlwrap $(COMPILER) --load tests/test-suite.lisp --eval '($(proj)/test:run-suites)' $(TOPTS)
-	-rlwrap $(COMPILER) --load tests/test-suite.lisp --eval '(asdf:test-system :$(proj)/test)' $(TOPTS)
+	-if [ "clisp" = $(LISP) ] ; then \
+#		rlwrap $(LISP) -i tests/test-suite.lisp -x '($(proj)/test:run-suites)' $(TOPTS) ; \
+		rlwrap $(LISP) -i tests/test-suite.lisp -x '(asdf:test-system :$(proj)/test)' $(TOPTS) ; \
+	else \
+#		rlwrap $(LISP) --load tests/test-suite.lisp --eval '($(proj)/test:run-suites)' $(TOPTS) ; \
+		rlwrap $(LISP) --load tests/test-suite.lisp --eval '(asdf:test-system :$(proj)/test)' $(TOPTS) ; \
+	fi
 uninstall install: ## [un]install artifacts
 	-@if [ "uninstall" = "$@" ] ; then \
 		rm -rf ~/quicklisp/local-projects/$(parent)/$(proj) ; \
@@ -39,7 +44,11 @@ uninstall install: ## [un]install artifacts
 		ln -sf $(PWD) $(proj) ; \
 		mv $(proj) ~/quicklisp/local-projects/$(parent)/ ; \
 	fi
-	-rlwrap $(COMPILER) --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "$(proj)") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+	-if [ "clisp" = $(LISP) ] ; then \
+		rlwrap $(LISP) -x '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "$(proj)") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; \
+	else \
+		rlwrap $(LISP) --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "$(proj)") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; \
+	fi
 dist: | build/$(distdir) ## [FMTS="tar.gz,zip"] archive source code
 	-@for fmt in `echo $(FMTS) | tr ',' ' '` ; do \
 		case $$fmt in \
@@ -58,4 +67,8 @@ dist: | build/$(distdir) ## [FMTS="tar.gz,zip"] archive source code
 	-@rm -r build/$(distdir)
 doc: ## generate documentation
 	-rm -fr build/html ; mkdir -p build/html
-	-rlwrap $(COMPILER) --load doc_gen.lisp --eval '(uiop:quit)'
+	-if [ "clisp" = $(LISP) ] ; then \
+		rlwrap $(LISP) -i doc_gen.lisp -x '(uiop:quit)' ; \
+	else \
+		rlwrap $(LISP) --load doc_gen.lisp --eval '(uiop:quit)' ; \
+	fi

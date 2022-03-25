@@ -10,8 +10,8 @@ builddir = build
 
 PKG_CONFIG = pkg-config --with-path=${PREFIX}/lib/pkgconfig
 
-# COMPILER=[sbcl | ccl]
-COMPILER = $${COMPILER:-sbcl}
+# LISP=[sbcl | clisp]
+LISP = $${LISP:-sbcl}
 
 pkg = {{project}}{{^project}}util{{/project}}
 parent = {{parent}}{{^parent}}introlisp{{/parent}}
@@ -37,20 +37,28 @@ build build/.depend: custom_cmd
 
 build build/ts_main: custom_cmd || tests/test-suite.lisp
   DESC = Compile test
-# #rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(${proj}/test:save-image)'
-# #$${HOME}/bin/buildapp_${COMPILER} --load tests/test-suite.lisp --entry ${proj}/test:main --output build/ts_main
+# #$${HOME}/bin/buildapp_${LISP} --load tests/test-suite.lisp --entry ${proj}/test:main --output build/ts_main
+# #rlwrap ${LISP} [--load | -i] tests/test-suite.lisp [--eval | -x] '(${proj}/test:save-image)'
   COMMAND = $
     rm build/ts_main ; $
-    rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(asdf:make :${proj}/test-image)'
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -i tests/test-suite.lisp -x '(asdf:make :${proj}/test-image)' ; $
+    else $
+      rlwrap ${LISP} --load tests/test-suite.lisp --eval '(asdf:make :${proj}/test-image)' ; $
+    fi
 {{#executable}}
 
 build build/main: custom_cmd || src/main.lisp
   DESC = Compile main
-# #rlwrap ${COMPILER} --load src/main.lisp --eval '(${proj}:save-image)'
-# #$${HOME}/bin/buildapp_${COMPILER} --load src/main.lisp --entry ${proj}:main --output build/main
+# #$${HOME}/bin/buildapp_${LISP} --load src/main.lisp --entry ${proj}:main --output build/main
+# #rlwrap ${LISP} [--load | -i] src/main.lisp [--eval | -x] '(${proj}:save-image)'
   COMMAND = $
     rm build/main ; $
-    rlwrap ${COMPILER} --load src/main.lisp --eval '(asdf:make :$(proj)/run-image)'
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -i src/main.lisp -x '(asdf:make :${proj}/run-image)' ; $
+    else $
+      rlwrap ${LISP} --load src/main.lisp --eval '(asdf:make :${proj}/run-image)' ; $
+    fi
 
 build run: custom_cmd || build/main
   DESC = Run main app [ARGS=$${ARGS:-}]
@@ -60,8 +68,13 @@ build run: custom_cmd || build/main
 
 build repl_run: custom_cmd || src/main.lisp
   DESC = In repl, run main app [ARGS=$${ARGS:-}]
-# #rlwrap ${COMPILER} --load src/main.lisp --eval '(progn (asdf:load-system :${proj}) (${proj}:run-main))' $${ARGS:-}
-  COMMAND = rlwrap ${COMPILER} --load src/main.lisp --eval '(asdf:test-system :${proj}/run)' $${ARGS:-}
+# #rlwrap ${LISP} [--load | -i] src/main.lisp [--eval | -x] '(progn (asdf:load-system :${proj}) (${proj}:run-main))' $${ARGS:-}
+  COMMAND = $
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -i src/main.lisp -x '(asdf:test-system :${proj}/run)' $${ARGS:-} ; $
+    else $
+      rlwrap ${LISP} --load src/main.lisp --eval '(asdf:test-system :${proj}/run)' $${ARGS:-} ; $
+    fi
   pool = console
   restat = 1
 {{/executable}}

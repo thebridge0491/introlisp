@@ -7,8 +7,8 @@ require 'rake/packagetask'
 CLEAN.include("**/core*", "**/*~", "**/*.o", "**/*.log", ".coverage")
 CLOBBER.include("build/*", "build/.??*")
 
-# COMPILER=[sbcl | ccl]
-COMPILER = ENV['COMPILER'] ? ENV['COMPILER'] : 'sbcl'
+# LISP=[sbcl | clisp]
+LISP = ENV['LISP'] ? ENV['LISP'] : 'sbcl'
 
 def _get_task_opts(options={})
   require 'optparse'
@@ -42,7 +42,7 @@ desc "Help info"
 task :help do |task_name|
   SUBDIRS.each { |dirX| cd(dirX) { sh "#{RAKE} #{task_name}" } }
   puts "##### Top-level multiproject: #{parent} #####"
-  puts "Usage: #{RAKE} [SUBDIRS=#{SUBDIRS.join(' ')}] [COMPILER=#{COMPILER}] [task]"
+  puts "Usage: #{RAKE} [SUBDIRS=#{SUBDIRS.join(' ')}] [LISP=#{LISP}] [task]"
   sh "#{RAKE} -T"
 end
 

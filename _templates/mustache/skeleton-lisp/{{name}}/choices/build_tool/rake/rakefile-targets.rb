@@ -8,7 +8,7 @@ CLOBBER.include('build/*', 'build/.??*')
 
 desc 'Help info'
 task :help do
-  puts "===== subproject: #{VARS.proj} =====\nHelp: #{RAKE} [COMPILER=\"$(COMPILER}\"] [task]"
+  puts "===== subproject: #{VARS.proj} =====\nHelp: #{RAKE} [LISP=\"$(LISP}\"] [task]"
   sh "#{RAKE} -T"
 end
 
@@ -21,21 +21,33 @@ end
 
 desc 'Start REPL & test: rake repl_test'
 task :repl_test, [:topt1] do |t, topts|
-  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load tests/test-suite.lisp --eval '(asdf:test-system :#{VARS.proj}/test)' #{topts[:topt1]} #{topts.extras.join(' ')} || true"
+  if "clisp" == "#{LISP}"
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} -i tests/test-suite.lisp -x '(asdf:test-system :#{VARS.proj}/test)' #{topts[:topt1]} #{topts.extras.join(' ')} || true"
+  else
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} --load tests/test-suite.lisp --eval '(asdf:test-system :#{VARS.proj}/test)' #{topts[:topt1]} #{topts.extras.join(' ')} || true"
+  end
 end
 
 #----------------------------------------
 desc 'Uninstall artifacts'
 task :uninstall do 
   rm_rf("#{ENV["HOME"]}/quicklisp/local-projects/#{VARS.parent}/#{VARS.proj}") || true
-  sh "rlwrap #{COMPILER} --eval '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  if "clisp" == "#{LISP}"
+    sh "rlwrap #{LISP} -x '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  else
+    sh "rlwrap #{LISP} --eval '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  end
 end
 
 desc 'Install artifacts'
 task :install do
   ln_sf("#{ENV['PWD']}", "#{VARS.proj}") || true
   mv("#{VARS.proj}", "#{ENV["HOME"]}/quicklisp/local-projects/#{VARS.parent}/") || true
-  sh "rlwrap #{COMPILER} --eval '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  if "clisp" == "#{LISP}"
+    sh "rlwrap #{LISP} -x '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  else
+    sh "rlwrap #{LISP} --eval '(progn (ql:register-local-projects) (format t \"~%~a~%\" (find (quote \"#{VARS.proj}\") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' || true"
+  end
 end
 
 file "build/#{VARS.proj}-#{VARS.version}" do |p|
@@ -84,5 +96,9 @@ desc 'Generate API documentation'
 task :doc do
   rm_rf("build//html") || true
   mkdir_p('build/html')
-  sh "rlwrap #{COMPILER} --load doc_gen.lisp --eval '(uiop:quit)' || true"
+  if "clisp" == "#{LISP}"
+    sh "rlwrap #{LISP} -i doc_gen.lisp -x '(uiop:quit)' || true"
+  else
+    sh "rlwrap #{LISP} --load doc_gen.lisp --eval '(uiop:quit)' || true"
+  end
 end

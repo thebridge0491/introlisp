@@ -6,8 +6,8 @@ RAKE = ENV['RAKE'] ? ENV['RAKE'] : 'rake'
 
 PKG_CONFIG = "pkg-config --with-path=#{PREFIX}/lib/pkgconfig"
 
-# COMPILER=[sbcl | ccl]
-COMPILER = ENV['COMPILER'] ? ENV['COMPILER'] : 'sbcl'
+# LISP=[sbcl | clisp]
+LISP = ENV['LISP'] ? ENV['LISP'] : 'sbcl'
 
 class SharedVars
   attr_accessor :parent, :pkg, :proj, :version
@@ -36,9 +36,13 @@ end
 
 file 'build/ts_main' => 'tests/test-suite.lisp' do |t|
   rm_f(t.name)
-#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load tests/test-suite.lisp --eval '(#{VARS.proj}/test:save-image)' || true"
-#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{COMPILER} --load tests/test-suite.lisp --entry #{VARS.proj}/test:main --output #{t.name} || true"
-  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load tests/test-suite.lisp --eval '(asdf:make :#{VARS.proj}/test-image)' || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{LISP} --load tests/test-suite.lisp --entry #{VARS.proj}/test:main --output #{t.name} || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} [--load | -i] tests/test-suite.lisp [--eval | -x] '(#{VARS.proj}/test:save-image)' || true"
+  if "clisp" == "#{LISP}"
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} -i tests/test-suite.lisp -x '(asdf:make :#{VARS.proj}/test-image)' || true"
+  else
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} --load tests/test-suite.lisp --eval '(asdf:make :#{VARS.proj}/test-image)' || true"
+  end
 end
 
 desc 'Compile target(s)'
@@ -50,9 +54,13 @@ task :testCompile => ['build/ts_main']
 
 file 'build/main' => 'src/main.lisp' do |t|
   rm_f(t.name)
-#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(#{VARS.proj}/save-image)' || true"
-#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{COMPILER} --load src/main.lisp --entry #{VARS.proj}:main --output #{t.name} || true"
-  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(asdf:make :#{VARS.proj}/run-image)' || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} #{ENV["HOME"]}/bin/buildapp_#{LISP} --load src/main.lisp --entry #{VARS.proj}:main --output #{t.name} || true"
+#  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} [--load | -i] src/main.lisp [--eval | -x] '(#{VARS.proj}/save-image)' || true"
+  if "clisp" == "#{LISP}"
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} -i src/main.lisp -x '(asdf:make :#{VARS.proj}/run-image)' || true"
+  else
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} --load src/main.lisp --eval '(asdf:make :#{VARS.proj}/run-image)' || true"
+  end
 end
 
 desc 'Run program: rake run\[arg1,arg2\]'
@@ -64,7 +72,11 @@ end
 
 desc 'Start REPL & run: rake repl_run\[arg1,arg2\]'
 task :repl_run, [:arg1] do |t, args|
-  sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{COMPILER} --load src/main.lisp --eval '(asdf:test-system :#{VARS.proj}/run)' #{args[:arg1]} #{args.extras.join(' ')} || true"
+  if "clisp" == "#{LISP}"
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} -i src/main.lisp -x '(asdf:test-system :#{VARS.proj}/run)' #{args[:arg1]} #{args.extras.join(' ')} || true"
+  else
+    sh "LD_LIBRARY_PATH=#{ENV['LD_LIBRARY_PATH']} rlwrap #{LISP} --load src/main.lisp --eval '(asdf:test-system :#{VARS.proj}/run)' #{args[:arg1]} #{args.extras.join(' ')} || true"
+  end
 end
 {{/executable}}
 

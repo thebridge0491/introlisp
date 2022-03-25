@@ -3,8 +3,8 @@ ninja_required_version = 1.5
 
 builddir = build
 
-# COMPILER=[sbcl | ccl]
-COMPILER = sbcl
+# LISP=[sbcl | clisp]
+LISP = sbcl
 
 parent = {{parent}}{{^parent}}introlisp{{/parent}}
 version = {{version}}{{^version}}0.1.0{{/version}}
@@ -23,7 +23,7 @@ build help: custom_cmd
   COMMAND = $
     for dirX in $SUBDIRS ; do env OPTS=$${OPTS:-} ninja -C $$dirX help ; done ; $
 	echo "##### Top-level multiproject: $parent #####" ; $
-	echo "Usage: ninja [SUBDIRS="$SUBDIRS"] [COMPILER="$COMPILER"] [target]"
+	echo "Usage: ninja [SUBDIRS="$SUBDIRS"] [LISP="$LISP"] [target]"
 
 build clean: custom_cmd
   DESC = Clean build artifacts -- ninja -t clean [OPTS=$${OPTS:-}]

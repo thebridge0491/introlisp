@@ -16,7 +16,12 @@ build test: custom_cmd || build/ts_main
 
 build repl_test: custom_cmd || tests/test-suite.lisp
   DESC = In repl, run test [TOPTS=$${TOPTS:-}]
-  COMMAND = rlwrap ${COMPILER} --load tests/test-suite.lisp --eval '(asdf:test-system :${proj}/test)' $${TOPTS:-}
+  COMMAND = $
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -i tests/test-suite.lisp -x '(asdf:test-system :${proj}/test)' $${TOPTS:-} ; $
+    else $
+      rlwrap ${LISP} --load tests/test-suite.lisp --eval '(asdf:test-system :${proj}/test)' $${TOPTS:-} ; $
+    fi
   pool = console
   restat = 1
 
@@ -24,7 +29,11 @@ build uninstall: custom_cmd
   DESC = Uninstall artifacts
   COMMAND = $
     rm -rf ~/quicklisp/local-projects/${parent}/${proj} || true ; $
-    rlwrap ${COMPILER} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -x '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; $
+    else $
+      rlwrap ${LISP} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; $
+    fi
   pool = console
   restat = 1
 
@@ -33,7 +42,11 @@ build install: custom_cmd
   COMMAND = $
     ln -sf $${PWD} ${proj} ; $
     mv ${proj} ~/quicklisp/local-projects/${parent}/ ; $
-    rlwrap ${COMPILER} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))'
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -x '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; $
+    else $
+      rlwrap ${LISP} --eval '(progn (ql:register-local-projects) (format t "~%~a~%" (find (quote "${proj}") (ql:list-local-systems) :test (quote equal))) (uiop:quit))' ; $
+    fi
   pool = console
   restat = 1
 
@@ -70,6 +83,10 @@ build doc: custom_cmd
   DESC = Generate documentation
   COMMAND = $
     rm -fr build/html ; mkdir -p build/html ; $
-    rlwrap ${COMPILER} --load doc_gen.lisp --eval '(uiop:quit)'
+    if [ "clisp" = ${LISP} ] ; then $
+      rlwrap ${LISP} -i doc_gen.lisp -x '(uiop:quit)' ; $
+    else $
+      rlwrap ${LISP} --load doc_gen.lisp --eval '(uiop:quit)' ; $
+    fi
   pool = console
   restat = 1
